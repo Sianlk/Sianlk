@@ -1,0 +1,35 @@
+name: Load Test
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"   # Every Monday 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      vus:
+        description: "Virtual users"
+        default: "50"
+      duration:
+        description: "Duration (e.g. 60s)"
+        default: "60s"
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install k6
+        run: |
+          curl -L https://github.com/grafana/k6/releases/download/v0.50.0/k6-v0.50.0-linux-amd64.tar.gz | tar xz
+          sudo mv k6-v0.50.0-linux-amd64/k6 /usr/local/bin/k6
+      - name: Run load test
+        env:
+          BASE_URL: ${{ secrets.PRODUCTION_URL || "http://localhost:8000" }}
+        run: |
+          k6 run tests/load_test.js             --vus ${{ github.event.inputs.vus || 50 }}             --duration ${{ github.event.inputs.duration || "60s" }}             --out json=load-test-results.json             -e BASE_URL=$BASE_URL
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6-results-${{ github.run_id }}
+          path: load-test-results.json
+          retention-days: 30

@@ -1,70 +1,129 @@
-# Sianlk — World's #1 AI Platform
+<div align="center">
 
-> Building the Future with AI
+<img src="assets/graphics/icon-1024.svg" width="120" alt="Sianlk Icon" />
 
-[![Quality Gate](https://github.com/Sianlk/Sianlk/actions/workflows/ci.yml/badge.svg)](https://github.com/Sianlk/Sianlk/actions)
-[![Security](https://github.com/Sianlk/Sianlk/actions/workflows/codeql.yml/badge.svg)](https://github.com/Sianlk/Sianlk/security)
-[![codecov](https://codecov.io/gh/Sianlk/Sianlk/branch/main/graph/badge.svg)](https://codecov.io/gh/Sianlk/Sianlk)
+# Sianlk
 
-## What Makes This Unbeatable
+### One Platform. Infinite Possibilities.
 
-| Capability | Detail |
-|---|---|
-| Quantum AI Core | Patent-pending QML pipeline with quantum-secure HMAC |
-| Self-Healing | AI Workforce Engine auto-detects, triages, and resolves issues |
-| Zero-Trust Security | OWASP Top 10 mitigations + AI threat detection + anti-clone DNA |
-| SEO & Growth | AI keyword engine, Schema.org, structured data, UTM automation |
-| AI Chatbot | Multi-turn NLP chatbot with intent classification & auto-escalation |
-| Store Published | iOS App Store + Google Play ready with Fastlane CI/CD |
-| Performance | S-Tier benchmark: >50M ops/sec across all critical paths |
-| Observability | Structured logs, Prometheus metrics, OpenTelemetry traces |
+[![CI](https://github.com/Sianlk/Sianlk/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/Sianlk/Sianlk/actions/workflows/backend-ci.yml)
+[![Security Scan](https://github.com/Sianlk/Sianlk/actions/workflows/security-scan.yml/badge.svg)](https://github.com/Sianlk/Sianlk/actions/workflows/security-scan.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-iOS%20|%20Android-lightgrey.svg)](https://sianlk.com)
+[![FastAPI](https://img.shields.io/badge/backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com)
+[![React Native](https://img.shields.io/badge/mobile-React%20Native-61DAFB.svg)](https://reactnative.dev)
 
-## Architecture
+**AI, SaaS, business platform**
 
-```
-┌─────────────────────────────────────────────────┐
-│                 Sianlk                      │
-│                                                 │
-│  ┌──────────────┐   ┌──────────────────────┐   │
-│  │  Quantum AI  │   │   AI Workforce Engine  │   │
-│  │  Core + QML  │   │  Self-Heal | Tickets  │   │
-│  └──────┬───────┘   └──────────┬───────────┘   │
-│         │                      │                │
-│  ┌──────▼──────────────────────▼───────────┐   │
-│  │        Zero-Trust Security Layer        │   │
-│  │    OWASP | HMAC | Anti-Clone DNA        │   │
-│  └──────────────────┬────────────────────  ┘   │
-│                     │                           │
-│  ┌──────────────────▼────────────────────────┐ │
-│  │     AI Chatbot + SEO + Marketing AI      │ │
-│  └───────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────┘
-```
+[Website](https://sianlk.com) · [Privacy Policy](https://sianlk.com/privacy) · [Support](https://sianlk.com/support)
+
+</div>
+
+---
+
+## Overview
+
+**Sianlk** — One Platform. Infinite Possibilities.
+
+Built on a production-grade stack: FastAPI (Python 3.12) backend + React Native (Expo) mobile app, with full authentication, payments, observability, and App Store deployment pipelines.
+
+## Features
+
+- **AI-Powered Core** — Intelligent automation and recommendations tailored to AI
+- **Secure Auth** — Email/password + TOTP MFA + Google Sign-In + Apple Sign In
+- **Stripe Payments** — Subscription tiers with customer portal and webhook handling
+- **Real-time** — WebSocket notifications and live data streaming
+- **GDPR Compliant** — Data export, deletion, cookie consent (Articles 17 & 20)
+- **PWA Ready** — Service Worker, offline support, installable web app
+- **Observability** — Prometheus metrics, OpenTelemetry tracing, structured JSON logging
+- **App Store Ready** — Fastlane automation for iOS TestFlight and Google Play deployment
+
+## Tech Stack
+
+| Layer       | Technology                                  |
+|-------------|---------------------------------------------|
+| Mobile      | React Native · Expo · TypeScript · Zustand  |
+| Backend     | FastAPI · Python 3.12 · async SQLAlchemy    |
+| Database    | PostgreSQL 16 · Alembic migrations          |
+| Cache       | Redis 7                                     |
+| Auth        | JWT · TOTP MFA · OAuth2 (Google + Apple)    |
+| Payments    | Stripe Subscriptions + Webhooks             |
+| Infra       | Docker · nginx · GitHub Actions CI/CD       |
+| Monitoring  | Prometheus · OpenTelemetry · Sentry         |
 
 ## Quick Start
 
 ```bash
+# Clone the repo
 git clone https://github.com/Sianlk/Sianlk.git
 cd Sianlk
-pip install -r requirements.txt
-python -c "from core.quantum_core import QMLPipeline; p = QMLPipeline(); print(p.infer([0.5, 0.3, 0.8]))"
+
+# Backend
+cp .env.example .env        # Fill in your secrets
+docker compose up -d        # Starts API + PostgreSQL + Redis + nginx
+
+# Run DB migrations
+docker compose exec api alembic upgrade head
+
+# Mobile
+npm install
+npx expo start
 ```
 
-## Publishing to App & Play Store
+## Project Structure
+
+```
+Sianlk/
+├── api/                    # FastAPI backend
+│   ├── core/               # Config, DB, security, metrics, telemetry
+│   ├── models/             # SQLAlchemy models
+│   ├── routes/             # Auth, users, payments, GDPR, WebSocket
+│   └── middleware/         # Security headers, rate limiting
+├── src/                    # React Native app
+│   ├── api/                # Typed fetch client with JWT refresh
+│   ├── hooks/              # useAuth hook
+│   ├── navigation/         # App, Auth, and Tab navigators
+│   ├── screens/            # Login, Register, Home, Profile, Settings
+│   └── store/              # Zustand auth store
+├── fastlane/               # App Store & Google Play automation
+│   ├── metadata/           # Store listing copy
+│   └── screenshots/        # Store screenshots (SVG)
+├── assets/                 # Branding: icons, splash, feature graphic
+├── public/                 # PWA: favicon, manifest, service worker
+├── tests/                  # pytest async test suite
+├── alembic/                # Database migrations
+├── k8s/                    # Kubernetes manifests
+├── .github/                # CI/CD workflows, SECRETS_SETUP.md
+└── docker-compose.yml
+```
+
+## App Store Deployment
 
 ```bash
-# Install Fastlane
-gem install fastlane
-
-# iOS: TestFlight beta
+# iOS — Upload to TestFlight
 fastlane ios beta
 
-# Android: Play Internal
+# Android — Upload to Google Play Internal Testing
 fastlane android beta
-
-# Full production release (triggered on git tag)
-git tag v1.0.0 && git push --tags
 ```
 
+See `.github/APP_STORE_CHECKLIST.md` for pre-submission requirements and `.github/SECRETS_SETUP.md` for required secrets.
+
+## Security
+
+- Stripe webhook signatures verified (HMAC-SHA256)
+- JWT tokens with short expiry + refresh rotation
+- bcrypt password hashing
+- Rate limiting (100 req/60s sliding window)
+- Security headers: CSP, HSTS, X-Frame-Options, COOP, COEP
+- Weekly Bandit SAST, Safety CVE, Trivy container scan, Gitleaks
+
 ## License
-Copyright © 2026 Sianlk. All rights reserved. Proprietary and confidential.
+
+MIT — see [LICENSE](LICENSE)
+
+---
+
+<div align="center">
+Built with ❤️ by <a href="https://sianlk.com">Sianlk</a>
+</div>

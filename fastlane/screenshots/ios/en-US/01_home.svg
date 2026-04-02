@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" width="390" height="844">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1D4ED8;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#1D4ED8CC;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <!-- Phone chrome -->
+  <rect width="390" height="844" rx="40" fill="#1F2937"/>
+  <rect x="8" y="8" width="374" height="828" rx="34" fill="url(#bg)"/>
+  <!-- Status bar -->
+  <rect x="8" y="8" width="374" height="50" rx="34" fill="#1D4ED8"/>
+  <text x="30" y="40" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="14" fill="white" opacity="0.9">9:41</text>
+  <!-- Hero card -->
+  <rect x="24" y="80" width="342" height="180" rx="20" fill="white" opacity="0.15"/>
+  <text x="44" y="120" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="13" fill="white" opacity="0.75">Welcome back</text>
+  <text x="44" y="152" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="26" font-weight="bold" fill="white">Sianlk</text>
+  <text x="44" y="180" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="13" fill="white" opacity="0.7">One Platform. Infinite Possibilities.</text>
+  <!-- Stat cards -->
+  <rect x="24" y="280" width="160" height="100" rx="16" fill="white" opacity="0.18"/>
+  <text x="44" y="315" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="11" fill="white" opacity="0.7">AI REQUESTS</text>
+  <text x="44" y="350" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="28" font-weight="bold" fill="white">2,847</text>
+  <rect x="206" y="280" width="160" height="100" rx="16" fill="white" opacity="0.18"/>
+  <text x="226" y="315" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="11" fill="white" opacity="0.7">ACCURACY</text>
+  <text x="226" y="350" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="28" font-weight="bold" fill="white">98.7%</text>
+  <!-- Activity feed -->
+  <rect x="24" y="400" width="342" height="60" rx="12" fill="white" opacity="0.12"/>
+  <circle cx="55" cy="430" r="16" fill="white" opacity="0.3"/>
+  <text x="55" y="436" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="13" fill="white" text-anchor="middle">AI</text>
+  <text x="82" y="425" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="white">Analysis complete</text>
+  <text x="82" y="445" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="11" fill="white" opacity="0.6">Just now</text>
+  <rect x="24" y="472" width="342" height="60" rx="12" fill="white" opacity="0.08"/>
+  <circle cx="55" cy="502" r="16" fill="white" opacity="0.2"/>
+  <text x="55" y="508" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="13" fill="white" text-anchor="middle">✓</text>
+  <text x="82" y="497" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="white">Task automated</text>
+  <text x="82" y="517" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="11" fill="white" opacity="0.6">2 min ago</text>
+  <!-- Tab bar -->
+  <rect x="8" y="780" width="374" height="56" rx="0" fill="white" opacity="0.1"/>
+  <text x="75"  y="813" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="22" fill="white" text-anchor="middle">🏠</text>
+  <text x="195" y="813" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="22" fill="white" text-anchor="middle" opacity="0.5">👤</text>
+  <text x="315" y="813" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="22" fill="white" text-anchor="middle" opacity="0.5">⚙️</text>
+  <!-- Caption -->
+  <text x="195" y="740" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">One Platform. Infinite Possibilities.</text>
+</svg>

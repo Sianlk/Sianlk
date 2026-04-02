@@ -1,24 +1,34 @@
 {
-  "name": "Sianlk Platform",
+  "name": "Sianlk",
   "short_name": "Sianlk",
-  "description": "The world's #1 AI Platform",
+  "description": "Sianlk is the AI-first business operating system built for modern enterprises \u2014 unifying CRM, analytics, payments, communications, and automation.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#6C5CE7",
-  "theme_color": "#6C5CE7",
+  "background_color": "#EFF6FF",
+  "theme_color": "#1D4ED8",
   "orientation": "portrait-primary",
   "icons": [
-    {"src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable any"},
-    {"src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable any"}
+    {
+      "src": "/logo192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
   ],
-  "screenshots": [
-    {"src": "/assets/screenshot-1.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow"},
-    {"src": "/assets/screenshot-2.png", "sizes": "1920x1080", "type": "image/png", "form_factor": "wide"}
+  "categories": [
+    "productivity",
+    "utilities"
   ],
-  "categories": ["productivity", "utilities", "business"],
-  "prefer_related_applications": false,
-  "related_applications": [
-    {"platform": "play", "id": "com.sianlk.platform"},
-    {"platform": "itunes", "url": "https://apps.apple.com/app/sianlk"}
-  ]
+  "screenshots": []
 }

@@ -42,7 +42,7 @@ jobs:
           REDIS_URL: redis://localhost:6379
           SECRET_KEY: test_secret_key_64_chars_minimum_for_security_requirements_ok
         run: pytest tests/ -v --cov=api --cov-report=xml --cov-report=term-missing
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false

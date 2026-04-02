@@ -1,0 +1,32 @@
+default_platform(:ios)
+
+platform :ios do
+  lane :test do
+    run_tests(scheme: 'Sianlk', clean: true)
+  end
+  lane :beta do
+    increment_build_number(xcodeproj: 'ios/Sianlk.xcodeproj')
+    build_app(scheme: 'Sianlk', export_method: 'app-store')
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+  lane :release do
+    capture_screenshots
+    increment_build_number(xcodeproj: 'ios/Sianlk.xcodeproj')
+    build_app(scheme: 'Sianlk', export_method: 'app-store')
+    upload_to_app_store(force: true, skip_screenshots: false)
+  end
+end
+
+platform :android do
+  lane :test do
+    gradle(task: 'test', project_dir: 'android/')
+  end
+  lane :beta do
+    gradle(task: 'bundle', build_type: 'Release', project_dir: 'android/')
+    upload_to_play_store(track: 'internal', aab: 'android/app/build/outputs/bundle/release/app-release.aab')
+  end
+  lane :release do
+    gradle(task: 'bundle', build_type: 'Release', project_dir: 'android/')
+    upload_to_play_store(track: 'production', rollout: '0.1', aab: 'android/app/build/outputs/bundle/release/app-release.aab')
+  end
+end

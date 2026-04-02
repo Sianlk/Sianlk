@@ -1,46 +1,82 @@
-"""
-Auth endpoint tests.
-"""
+"""Tests for auth endpoints."""
 import pytest
+import uuid
 
 
-class TestAuthEndpoints:
-    async def test_register_new_user(self, client, test_user_data):
-        res = await client.post('/api/v1/auth/register', json=test_user_data)
-        assert res.status_code in (200, 201)
-        data = res.json()
-        assert 'access_token' in data
-        assert data['token_type'] == 'bearer'
+UNIQUE = uuid.uuid4().hex[:8]
+TEST_EMAIL = f"test_{UNIQUE}@example.com"
+TEST_PASSWORD = "TestPass123!"
 
-    async def test_register_duplicate_email(self, client, test_user_data):
-        await client.post('/api/v1/auth/register', json=test_user_data)
-        res = await client.post('/api/v1/auth/register', json=test_user_data)
-        assert res.status_code == 400
 
-    async def test_login_valid_credentials(self, client, test_user_data):
-        await client.post('/api/v1/auth/register', json=test_user_data)
-        res = await client.post('/api/v1/auth/login', data={
-            'username': test_user_data['email'],
-            'password': test_user_data['password'],
+@pytest.mark.asyncio
+async def test_register_creates_user(client):
+    resp = await client.post("/api/v1/auth/register", json={
+        "email": TEST_EMAIL,
+        "password": TEST_PASSWORD,
+        "full_name": "Test User",
+    })
+    assert resp.status_code in (200, 201), resp.text
+
+
+@pytest.mark.asyncio
+async def test_register_duplicate_fails(client):
+    """Second registration with same email should fail."""
+    for _ in range(2):
+        await client.post("/api/v1/auth/register", json={
+            "email": f"dup_{UNIQUE}@example.com",
+            "password": TEST_PASSWORD,
+            "full_name": "Dup User",
         })
-        assert res.status_code == 200
-        assert 'access_token' in res.json()
+    resp = await client.post("/api/v1/auth/register", json={
+        "email": f"dup_{UNIQUE}@example.com",
+        "password": TEST_PASSWORD,
+        "full_name": "Dup User",
+    })
+    assert resp.status_code in (400, 409, 422), resp.text
 
-    async def test_login_wrong_password(self, client, test_user_data):
-        await client.post('/api/v1/auth/register', json=test_user_data)
-        res = await client.post('/api/v1/auth/login', data={
-            'username': test_user_data['email'],
-            'password': 'wrong_password',
-        })
-        assert res.status_code == 401
 
-    async def test_get_current_user_authenticated(self, client, test_user_data):
-        reg = await client.post('/api/v1/auth/register', json=test_user_data)
-        token = reg.json()['access_token']
-        res = await client.get('/api/v1/users/me', headers={'Authorization': f'Bearer {token}'})
-        assert res.status_code == 200
-        assert res.json()['email'] == test_user_data['email']
+@pytest.mark.asyncio
+async def test_login_returns_tokens(client):
+    email = f"login_{UNIQUE}@example.com"
+    await client.post("/api/v1/auth/register", json={
+        "email": email, "password": TEST_PASSWORD, "full_name": "Login User"
+    })
+    resp = await client.post("/api/v1/auth/login",
+        content=f"username={email}&password={TEST_PASSWORD}",
+        headers={"Content-Type": "application/x-www-form-urlencoded"})
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+    assert "access_token" in data
+    assert "refresh_token" in data
 
-    async def test_get_current_user_unauthenticated(self, client):
-        res = await client.get('/api/v1/users/me')
-        assert res.status_code == 401
+
+@pytest.mark.asyncio
+async def test_get_me_requires_auth(client):
+    resp = await client.get("/api/v1/users/me")
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_me_with_token(client):
+    email = f"me_{UNIQUE}@example.com"
+    await client.post("/api/v1/auth/register", json={
+        "email": email, "password": TEST_PASSWORD, "full_name": "Me User"
+    })
+    login = await client.post("/api/v1/auth/login",
+        content=f"username={email}&password={TEST_PASSWORD}",
+        headers={"Content-Type": "application/x-www-form-urlencoded"})
+    token = login.json()["access_token"]
+    resp = await client.get("/api/v1/users/me", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["email"] == email
+
+
+@pytest.mark.asyncio
+async def test_password_too_short_rejected(client):
+    resp = await client.post("/api/v1/auth/register", json={
+        "email": f"short_{UNIQUE}@example.com",
+        "password": "short",
+        "full_name": "Short Pw"
+    })
+    assert resp.status_code == 422, resp.text

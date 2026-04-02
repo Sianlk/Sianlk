@@ -1,0 +1,75 @@
+# docker-compose.override.yml
+# Local development overrides — hot-reload, debug ports, test DB.
+# Automatically merged with docker-compose.yml by Docker Compose.
+version: "3.9"
+services:
+  api:
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./api:/app/api:cached
+      - ./tests:/app/tests:cached
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/app_dev
+      REDIS_URL: redis://redis:6379/0
+      LOG_LEVEL: debug
+    command: >
+      uvicorn api.main:app
+        --host 0.0.0.0
+        --port 8000
+        --reload
+        --reload-dir api
+        --log-level debug
+    ports:
+      - "8000:8000"
+      - "5678:5678"   # debugpy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redisdata_dev:/data
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_dev:/var/lib/grafana
+      - ./monitoring/grafana-dashboard.json:/etc/grafana/provisioning/dashboards/app.json:ro
+
+volumes:
+  pgdata_dev:
+  redisdata_dev:
+  grafana_dev:

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120">
+  <defs>
+    <linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <!-- Icon mark -->
+  <rect x="0" y="10" width="80" height="80" rx="18" fill="url(#lg)"/>
+  <text x="40" y="63" font-family="SF Pro Display,-apple-system,Helvetica Neue,Arial,sans-serif"
+        font-size="42" font-weight="800" fill="white" text-anchor="middle">S</text>
+  <!-- App name -->
+  <text x="96" y="52" font-family="SF Pro Display,-apple-system,Helvetica Neue,Arial,sans-serif"
+        font-size="32" font-weight="700" fill="#1D4ED8">Sianlk</text>
+  <!-- Tagline -->
+  <text x="96" y="76" font-family="SF Pro Display,-apple-system,Helvetica Neue,Arial,sans-serif"
+        font-size="13" font-weight="400" fill="#6B7280">One Platform. Infinite Possibilities.</text>
+</svg>

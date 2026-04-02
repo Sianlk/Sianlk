@@ -1,0 +1,77 @@
+name: AI Workforce — Auto-Triage & Self-Healing
+
+on:
+  issues:
+    types: [opened, reopened]
+  pull_request:
+    types: [opened, synchronize]
+  schedule:
+    - cron: "*/15 * * * *"   # Self-evolution cycle every 15 min
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues'
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: AI Triage Issue
+        run: |
+          python - <<'EOF'
+          import os, json
+          title = os.environ.get("ISSUE_TITLE", "")
+          body  = os.environ.get("ISSUE_BODY", "")
+          text  = (title + " " + body).lower()
+          if any(w in text for w in ["crash","down","payment","data loss","security"]):
+              label = "P0-CRITICAL"
+          elif any(w in text for w in ["broken","fail","error","not work"]):
+              label = "P1-HIGH"
+          elif any(w in text for w in ["slow","sometimes","occasional"]):
+              label = "P2-MEDIUM"
+          else:
+              label = "P3-LOW"
+          print(f"TRIAGE_RESULT={label}")
+          EOF
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY:  ${{ github.event.issue.body }}
+
+  sast-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: python, javascript
+      - uses: github/codeql-action/autobuild@v3
+      - uses: github/codeql-action/analyze@v3
+
+  self-evolution:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Run Evolution Cycle
+        run: |
+          python - <<'EOF'
+          import sys, os
+          sys.path.insert(0, ".")
+          try:
+              from core.ai_workforce import AIAgent
+              agent = AIAgent()
+              result = agent.run_cycle()
+              print(json.dumps(result, indent=2))
+          except Exception as e:
+              print(f"Evolution cycle error: {e}")
+          import json
+          EOF

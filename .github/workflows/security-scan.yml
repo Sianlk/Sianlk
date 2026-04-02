@@ -1,11 +1,54 @@
 name: Security Scan
+
 on:
-  pull_request:
+  schedule:
+    - cron: "0 2 * * 0"  # Weekly Sunday 02:00 UTC
   push:
-    branches: [ main, master ]
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  security:
+  sast:
+    name: SAST — Bandit + Safety
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install bandit safety ruff
+      - name: Bandit SAST
+        run: bandit -r api/ -ll -f json -o bandit-results.json || true
+      - name: Safety CVE check
+        run: safety check -r requirements.txt --json > safety-results.json || true
+      - name: Ruff lint
+        run: ruff check api/ --output-format json > ruff-results.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sast-results-${{ github.run_id }}
+          path: "*.json"
+          retention-days: 90
+
+  container-scan:
+    name: Container Scan — Trivy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan Dockerfile
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "config"
+          scan-ref: "."
+          format: "table"
+          exit-code: "0"
+          severity: "CRITICAL,HIGH"
+
+  secret-scan:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

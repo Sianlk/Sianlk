@@ -17,7 +17,7 @@ jobs:
         with: {node-version: '20', cache: npm}
       - run: npm ci --if-present
       - run: npm test -- --coverage --passWithNoTests
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with: {python-version: '3.12'}
       - run: pip install pytest pytest-cov --quiet ; pytest -q --tb=short || true
       - uses: codecov/codecov-action@v6

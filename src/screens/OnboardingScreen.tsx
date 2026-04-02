@@ -1,113 +1,67 @@
-/**
- * Onboarding flow — required by App Store reviewers.
- * Presents value proposition + permissions rationale before requesting.
- */
 import React, {useState, useRef} from 'react';
-import {
-  View, Text, StyleSheet, FlatList, Dimensions,
-  TouchableOpacity, Platform, StatusBar,
-} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions} from 'react-native';
 
+const SLIDES = [{"emoji": "\ud83d\ude80", "title": "Sianlk", "body": "One Platform. Infinite Possibilities."}, {"emoji": "\ud83d\udd12", "title": "Bank-Grade Security", "body": "Your data is protected with end-to-end encryption and MFA."}, {"emoji": "\u26a1", "title": "Built for Speed", "body": "Real-time AI processing with sub-second response times."}];
 const {width} = Dimensions.get('window');
 
-const SLIDES = [
-  {
-    id: '1', title: 'Welcome',
-    subtitle: 'The most advanced AI platform built for you.',
-    icon: '🚀',
-    bg: '#0f0f1a',
-  },
-  {
-    id: '2', title: 'AI-Powered',
-    subtitle: 'Quantum-grade AI working for you 24/7, secured and private.',
-    icon: '⚡',
-    bg: '#0a1628',
-  },
-  {
-    id: '3', title: 'Secure by Design',
-    subtitle: 'Military-grade encryption. Your data belongs only to you.',
-    icon: '🔐',
-    bg: '#0f1a0a',
-  },
-  {
-    id: '4', title: 'Get Started',
-    subtitle: 'Join thousands of users already using the platform.',
-    icon: '✅',
-    bg: '#1a0f28',
-    isFinal: true,
-  },
-];
-
-interface Props {
-  onComplete: () => void;
-}
-
-export const OnboardingScreen: React.FC<Props> = ({onComplete}) => {
-  const [index, setIndex] = useState(0);
-  const listRef = useRef<FlatList>(null);
+export default function OnboardingScreen({navigation}: any) {
+  const [idx, setIdx] = useState(0);
+  const ref = useRef<FlatList>(null);
 
   const next = () => {
-    if (index < SLIDES.length - 1) {
-      listRef.current?.scrollToIndex({index: index + 1, animated: true});
-      setIndex(i => i + 1);
+    if (idx < SLIDES.length - 1) {
+      ref.current?.scrollToIndex({index: idx + 1});
+      setIdx(idx + 1);
+    } else {
+      navigation.replace('Login');
     }
-  };
-
-  const finish = async () => {
-    await AsyncStorage.setItem('onboarding_complete', '1');
-    onComplete();
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
       <FlatList
-        ref={listRef}
+        ref={ref}
         data={SLIDES}
-        horizontal pagingEnabled scrollEnabled={false}
-        keyExtractor={s => s.id}
-        showsHorizontalScrollIndicator={false}
+        horizontal pagingEnabled showsHorizontalScrollIndicator={false}
+        scrollEnabled={false}
+        keyExtractor={(_, i) => String(i)}
         renderItem={({item}) => (
-          <View style={[styles.slide, {backgroundColor: item.bg, width}]}>
-            <Text style={styles.icon}>{item.icon}</Text>
+          <View style={styles.slide}>
+            <Text style={styles.emoji}>{item.emoji}</Text>
             <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.subtitle}>{item.subtitle}</Text>
+            <Text style={styles.body}>{item.body}</Text>
           </View>
         )}
       />
-      <View style={styles.footer}>
-        <View style={styles.dots}>
-          {SLIDES.map((_, i) => (
-            <View key={i} style={[styles.dot, i === index && styles.dotActive]} />
-          ))}
-        </View>
-        {SLIDES[index].isFinal ? (
-          <TouchableOpacity style={styles.btn} onPress={finish} accessibilityRole="button">
-            <Text style={styles.btnText}>Get Started</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.btn} onPress={next} accessibilityRole="button">
-            <Text style={styles.btnText}>Next</Text>
-          </TouchableOpacity>
-        )}
+      <View style={styles.dots}>
+        {SLIDES.map((_, i) => (
+          <View key={i} style={[styles.dot, i === idx && styles.dotActive]} />
+        ))}
       </View>
+      <TouchableOpacity style={styles.btn} onPress={next}>
+        <Text style={styles.btnTxt}>{idx === SLIDES.length - 1 ? 'Get Started' : 'Next'}</Text>
+      </TouchableOpacity>
+      {idx > 0 && (
+        <TouchableOpacity onPress={() => navigation.replace('Login')} style={styles.skip}>
+          <Text style={styles.skipTxt}>Skip</Text>
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
-};
+}
 
+const PRIMARY = '#1D4ED8';
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#0f0f1a'},
-  slide: {flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32},
-  icon: {fontSize: 80, marginBottom: 24},
-  title: {fontSize: 32, fontWeight: '800', color: '#fff', textAlign: 'center', marginBottom: 12},
-  subtitle: {fontSize: 17, color: '#aaa', textAlign: 'center', lineHeight: 26},
-  footer: {padding: 24, alignItems: 'center'},
-  dots: {flexDirection: 'row', marginBottom: 20},
-  dot: {width: 8, height: 8, borderRadius: 4, backgroundColor: '#333', marginHorizontal: 4},
-  dotActive: {width: 24, backgroundColor: '#6d6dff'},
-  btn: {backgroundColor: '#6d6dff', paddingHorizontal: 48, paddingVertical: 16,
-         borderRadius: 14, width: '100%', alignItems: 'center'},
-  btnText: {color: '#fff', fontSize: 17, fontWeight: '700'},
+  container: {flex:1, backgroundColor:'#FAFAFA', alignItems:'center'},
+  slide:     {width, alignItems:'center', justifyContent:'center', padding:40},
+  emoji:     {fontSize:72, marginBottom:24},
+  title:     {fontSize:28, fontWeight:'700', color:'#111827', textAlign:'center', marginBottom:12},
+  body:      {fontSize:16, color:'#6B7280', textAlign:'center', lineHeight:24},
+  dots:      {flexDirection:'row', gap:8, marginBottom:32},
+  dot:       {width:8, height:8, borderRadius:4, backgroundColor:'#E5E7EB'},
+  dotActive: {backgroundColor:PRIMARY, width:24},
+  btn:       {backgroundColor:PRIMARY, borderRadius:14, paddingVertical:16, paddingHorizontal:48, marginBottom:16},
+  btnTxt:    {color:'#fff', fontSize:17, fontWeight:'700'},
+  skip:      {marginBottom:8},
+  skipTxt:   {color:'#9CA3AF', fontSize:15},
 });

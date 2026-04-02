@@ -1,0 +1,68 @@
+# monitoring/alerts.yml
+groups:
+  - name: api.availability
+    interval: 30s
+    rules:
+      - alert: APIDown
+        expr: up{job="geniai-api"} == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations:
+          summary: "GeniAI API is down"
+          description: "Instance {{ $labels.instance }} unreachable for > 1 minute."
+
+      - alert: HighErrorRate
+        expr: rate(http_errors_total[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 2m
+        labels: {severity: warning}
+        annotations:
+          summary: "Error rate > 5%"
+
+      - alert: CriticalErrorRate
+        expr: rate(http_errors_total[5m]) / rate(http_requests_total[5m]) > 0.15
+        for: 1m
+        labels: {severity: critical}
+        annotations:
+          summary: "Critical error rate > 15%"
+
+  - name: api.performance
+    rules:
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 3m
+        labels: {severity: warning}
+        annotations:
+          summary: "p95 latency > 2s"
+
+  - name: api.security
+    rules:
+      - alert: BruteForceAttempt
+        expr: rate(auth_login_failures_total[5m]) > 10
+        for: 1m
+        labels: {severity: critical}
+        annotations:
+          summary: "Possible brute force attack"
+          description: "Auth failure rate {{ $value }} failures/s on {{ $labels.instance }}."
+
+      - alert: HighAuthFailureRate
+        expr: rate(auth_login_failures_total[5m]) / rate(auth_login_attempts_total[5m]) > 0.3
+        for: 2m
+        labels: {severity: warning}
+        annotations:
+          summary: "Auth failure rate > 30%"
+
+  - name: infrastructure
+    rules:
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 > 512
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: "API process > 512 MB RAM"
+
+      - alert: TooManyWebSocketConnections
+        expr: active_websocket_connections > 5000
+        for: 2m
+        labels: {severity: warning}
+        annotations:
+          summary: "WebSocket connections > 5000"

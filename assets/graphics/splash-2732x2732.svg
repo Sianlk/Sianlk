@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2732" height="2732" viewBox="0 0 2732 2732">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EFF6FF"/>
+      <stop offset="100%" stop-color="white"/>
+    </linearGradient>
+    <linearGradient id="icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <rect width="2732" height="2732" fill="url(#bg)"/>
+  <!-- Decorative circles -->
+  <circle cx="409" cy="327" r="300" fill="#1D4ED8" opacity="0.08"/>
+  <circle cx="2404" cy="2322" r="400" fill="#7C3AED" opacity="0.08"/>
+  <!-- App icon -->
+  <rect x="1166" y="1046" width="400" height="400" rx="88" fill="url(#icon)"/>
+  <text x="1366" y="1306" font-family="SF Pro Display,-apple-system,Helvetica Neue,Arial,sans-serif"
+        font-size="180" font-weight="800" fill="white" text-anchor="middle">S</text>
+  <!-- App name -->
+  <text x="1366" y="1426" font-family="SF Pro Display,-apple-system,Helvetica Neue,Arial,sans-serif"
+        font-size="120" font-weight="800" fill="#1D4ED8" text-anchor="middle">Sianlk</text>
+  <!-- Tagline -->
+  <text x="1366" y="1566" font-family="SF Pro Display,-apple-system,Helvetica Neue,Arial,sans-serif"
+        font-size="56" font-weight="400" fill="#6B7280" text-anchor="middle">One Platform. Infinite Possibilities.</text>
+</svg>

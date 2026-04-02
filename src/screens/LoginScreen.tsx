@@ -1,33 +1,32 @@
-import React, {useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView,
-        KeyboardAvoidingView, Platform, ScrollView, Alert} from 'react-native';
-import {useAuth} from '../hooks/useAuth';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView,
+        KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
+import { useAuth } from '../hooks/useAuth';
 
-export default function LoginScreen({navigation}: any) {
-  const [email, setEmail]       = useState('');
+const PRIMARY = '#1D4ED8';
+
+export default function LoginScreen({ navigation }: any) {
+  const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
-  const [showPw, setShowPw]     = useState(false);
-  const {login, isLoading}      = useAuth();
+  const [showPw,   setShowPw]   = useState(false);
+  const { login, isLoading }    = useAuth();
 
   const handleLogin = async () => {
-    if (!email.trim() || !password) {
+    if (!email.trim() || !password)
       return Alert.alert('Error', 'Please enter your email and password.');
-    }
-    const result = await login({email: email.trim().toLowerCase(), password});
+    const result = await login({ email: email.trim().toLowerCase(), password });
     if (!result.success) {
-      if (result.requiresMFA) {
-        navigation.navigate('MFA', {email: email.trim().toLowerCase(), password});
-      } else {
+      if (result.requiresMFA)
+        navigation.navigate('MFA', { email: email.trim().toLowerCase(), password });
+      else
         Alert.alert('Sign In Failed', result.error ?? 'Invalid email or password.');
-      }
     }
-    // success: navigation handled by auth state change in AppNavigator
   };
 
   return (
     <KeyboardAvoidingView style={styles.kav} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps='handled'>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.logoWrap}>
             <View style={styles.logoCircle}>
               <Text style={styles.logoText}>S</Text>
@@ -36,46 +35,26 @@ export default function LoginScreen({navigation}: any) {
           </View>
           <Text style={styles.title}>Sign In</Text>
           <TextInput
-            style={styles.input}
-            placeholder='Email address'
-            placeholderTextColor='#9CA3AF'
-            value={email}
-            onChangeText={setEmail}
-            keyboardType='email-address'
-            autoCapitalize='none'
-            autoComplete='email'
-            returnKeyType='next'
-          />
+            style={styles.input} placeholder="Email address" placeholderTextColor="#9CA3AF"
+            value={email} onChangeText={setEmail} keyboardType="email-address"
+            autoCapitalize="none" autoComplete="email" returnKeyType="next" />
           <View style={styles.pwWrap}>
             <TextInput
-              style={styles.pwInput}
-              placeholder='Password'
-              placeholderTextColor='#9CA3AF'
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPw}
-              autoComplete='password'
-              returnKeyType='go'
-              onSubmitEditing={handleLogin}
-            />
+              style={styles.pwInput} placeholder="Password" placeholderTextColor="#9CA3AF"
+              value={password} onChangeText={setPassword} secureTextEntry={!showPw}
+              autoComplete="password" returnKeyType="go" onSubmitEditing={handleLogin} />
             <TouchableOpacity onPress={() => setShowPw(!showPw)} style={styles.eyeBtn}>
-              <Text style={styles.eyeTxt}>{showPw ? '🙈' : '👁️'}</Text>
+              <Text style={styles.eyeTxt}>{showPw ? '🙈' : '👁'}</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={styles.forgotWrap}>
             <Text style={styles.forgotTxt}>Forgot password?</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.btn, isLoading && styles.btnDisabled]}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
+          <TouchableOpacity style={[styles.btn, isLoading ? styles.btnDisabled : {}]} onPress={handleLogin} disabled={isLoading}>
             <Text style={styles.btnTxt}>{isLoading ? 'Signing in...' : 'Sign In'}</Text>
           </TouchableOpacity>
           <View style={styles.divider}>
-            <View style={styles.divLine} />
-            <Text style={styles.divTxt}>or</Text>
-            <View style={styles.divLine} />
+            <View style={styles.divLine} /><Text style={styles.divTxt}>or</Text><View style={styles.divLine} />
           </View>
           <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('Register')}>
             <Text style={styles.secondaryTxt}>Create an account</Text>
@@ -86,7 +65,6 @@ export default function LoginScreen({navigation}: any) {
   );
 }
 
-const PRIMARY = '#1D4ED8';
 const styles = StyleSheet.create({
   kav:          {flex:1},
   container:    {flex:1, backgroundColor:'#FAFAFA'},

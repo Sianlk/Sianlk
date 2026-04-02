@@ -22,7 +22,7 @@ jobs:
         run: safety check -r requirements.txt --json > safety-results.json || true
       - name: Ruff lint
         run: ruff check api/ --output-format json > ruff-results.json || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: sast-results-${{ github.run_id }}

@@ -27,7 +27,7 @@ jobs:
         run: |
           k6 run tests/load_test.js             --vus ${{ github.event.inputs.vus || 50 }}             --duration ${{ github.event.inputs.duration || "60s" }}             --out json=load-test-results.json             -e BASE_URL=$BASE_URL
       - name: Upload results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: k6-results-${{ github.run_id }}

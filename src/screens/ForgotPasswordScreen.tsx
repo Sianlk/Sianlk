@@ -1,38 +1,35 @@
-import React, {useState} from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert, KeyboardAvoidingView, Platform} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView,
+        KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { api } from '../api/client';
 
-const API_BASE = 'https://api.sianlk.sianlk.com/api/v1';
+const PRIMARY = '#1D4ED8';
 
-export default function ForgotPasswordScreen({navigation}: any) {
-  const [email, setEmail]       = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [sent, setSent]         = useState(false);
+export default function ForgotPasswordScreen({ navigation }: any) {
+  const [email,     setEmail]     = useState('');
+  const [sent,      setSent]      = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!email.trim()) return Alert.alert('Error', 'Please enter your email address.');
-    setLoading(true);
+    if (!email.includes('@')) return Alert.alert('Error', 'Please enter a valid email address.');
+    setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/forgot-password`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({email: email.trim().toLowerCase()}),
-      });
-      if (res.ok || res.status === 202) {
-        setSent(true);
-      } else {
-        Alert.alert('Error', 'Something went wrong. Please try again.');
-      }
-    } catch { Alert.alert('Error', 'Network error. Please check your connection.'); }
-    finally { setLoading(false); }
+      await api.post('/api/v1/auth/forgot-password', { email: email.trim().toLowerCase() }, false);
+    } catch {
+      // Always succeed to prevent email enumeration (OWASP)
+    } finally {
+      setIsLoading(false);
+      setSent(true);
+    }
   };
 
   if (sent) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.center}>
-          <Text style={styles.icon}>📧</Text>
-          <Text style={styles.title}>Check your email</Text>
-          <Text style={styles.subtitle}>We sent a password reset link to {email}. Check your spam folder if you don't see it.</Text>
+          <Text style={styles.checkIcon}>Email Sent</Text>
+          <Text style={styles.sentTitle}>Check Your Email</Text>
+          <Text style={styles.sentBody}>If that email is registered, you will receive a reset link shortly.</Text>
           <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.btnTxt}>Back to Sign In</Text>
           </TouchableOpacity>
@@ -42,44 +39,42 @@ export default function ForgotPasswordScreen({navigation}: any) {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <SafeAreaView style={styles.inner}>
-        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-          <Text style={styles.backTxt}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Reset Password</Text>
-        <Text style={styles.subtitle}>Enter your email and we'll send you a reset link.</Text>
-        <TextInput
-          style={styles.input}
-          placeholder='your@email.com'
-          placeholderTextColor='#9CA3AF'
-          value={email}
-          onChangeText={setEmail}
-          keyboardType='email-address'
-          autoCapitalize='none'
-          autoComplete='email'
-        />
-        <TouchableOpacity style={[styles.btn, loading && styles.btnDisabled]} onPress={handleSubmit} disabled={loading}>
-          <Text style={styles.btnTxt}>{loading ? 'Sending...' : 'Send Reset Link'}</Text>
-        </TouchableOpacity>
+    <KeyboardAvoidingView style={styles.kav} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.inner}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back}>
+            <Text style={styles.backTxt}>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>Reset Password</Text>
+          <Text style={styles.subtitle}>Enter your email and we will send you a reset link.</Text>
+          <TextInput
+            style={styles.input} placeholder="Email address" placeholderTextColor="#9CA3AF"
+            value={email} onChangeText={setEmail} keyboardType="email-address"
+            autoCapitalize="none" autoComplete="email" />
+          <TouchableOpacity style={[styles.btn, isLoading ? styles.btnDisabled : {}]} onPress={handleSubmit} disabled={isLoading}>
+            <Text style={styles.btnTxt}>{isLoading ? 'Sending...' : 'Send Reset Link'}</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
-const PRIMARY = '#1D4ED8';
 const styles = StyleSheet.create({
+  kav:        {flex:1},
   container:  {flex:1, backgroundColor:'#FAFAFA'},
-  inner:      {flex:1, padding:24},
-  center:     {flex:1, alignItems:'center', justifyContent:'center', padding:24},
-  back:       {marginBottom:32},
-  backTxt:    {color:PRIMARY, fontSize:16},
-  icon:       {fontSize:48, marginBottom:16},
-  title:      {fontSize:26, fontWeight:'700', color:'#111827', marginBottom:8},
-  subtitle:   {fontSize:15, color:'#6B7280', marginBottom:32, lineHeight:22, textAlign:'center'},
+  inner:      {padding:24},
+  center:     {flex:1, padding:32, alignItems:'center', justifyContent:'center'},
+  back:       {marginBottom:24},
+  backTxt:    {color:PRIMARY, fontSize:15, fontWeight:'600'},
+  title:      {fontSize:28, fontWeight:'800', color:'#111827', marginBottom:8},
+  subtitle:   {fontSize:15, color:'#6B7280', marginBottom:24, lineHeight:22},
   input:      {backgroundColor:'#fff', borderWidth:1, borderColor:'#E5E7EB', borderRadius:12,
-               padding:16, fontSize:16, color:'#111827', marginBottom:16},
+                padding:16, fontSize:16, color:'#111827', marginBottom:16},
   btn:        {backgroundColor:PRIMARY, borderRadius:12, paddingVertical:16, alignItems:'center'},
   btnDisabled:{opacity:0.6},
   btnTxt:     {color:'#fff', fontSize:16, fontWeight:'700'},
+  checkIcon:  {fontSize:20, fontWeight:'700', color:PRIMARY, marginBottom:12},
+  sentTitle:  {fontSize:24, fontWeight:'800', color:'#111827', marginBottom:8, textAlign:'center'},
+  sentBody:   {fontSize:15, color:'#6B7280', textAlign:'center', lineHeight:22, marginBottom:32},
 });

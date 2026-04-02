@@ -1,0 +1,137 @@
+{
+  "title": "GeniAI API \u2014 Production Dashboard",
+  "uid": "geniai-api-prod",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request Rate (req/s)",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total[1m])",
+          "legendFormat": "RPS"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "id": 2,
+      "title": "Error Rate (%)",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "rate(http_errors_total[1m]) / rate(http_requests_total[1m]) * 100"
+        }
+      ],
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "id": 3,
+      "title": "Active WebSocket Connections",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "active_websocket_connections"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "id": 4,
+      "title": "Auth Failures/s",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "rate(auth_login_failures_total[5m])"
+        }
+      ],
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "id": 5,
+      "title": "Request Rate Over Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(http_requests_total[1m])",
+          "legendFormat": "Requests/s"
+        },
+        {
+          "expr": "rate(http_errors_total[1m])",
+          "legendFormat": "Errors/s"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 8
+      }
+    },
+    {
+      "id": 6,
+      "title": "Auth Attempts vs Failures",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(auth_login_attempts_total[5m])",
+          "legendFormat": "Attempts"
+        },
+        {
+          "expr": "rate(auth_login_failures_total[5m])",
+          "legendFormat": "Failures"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "id": 7,
+      "title": "WebSocket Connections",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "active_websocket_connections",
+          "legendFormat": "Active WS"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    }
+  ]
+}

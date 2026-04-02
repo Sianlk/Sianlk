@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="500" fill="url(#bg)"/>
+  <!-- Decorative circles -->
+  <circle cx="870" cy="100" r="160" fill="white" opacity="0.08"/>
+  <circle cx="921" cy="375" r="240" fill="white" opacity="0.06"/>
+  <circle cx="51" cy="450" r="140" fill="white" opacity="0.06"/>
+  <!-- Icon -->
+  <rect x="60" y="125" width="160" height="160" rx="36" fill="white" opacity="0.2"/>
+  <text x="140" y="233" font-family="Helvetica Neue,Arial,sans-serif"
+        font-size="80" font-weight="800" fill="white" text-anchor="middle">S</text>
+  <!-- App name -->
+  <text x="260" y="210" font-family="SF Pro Display,-apple-system,Helvetica Neue,Arial,sans-serif"
+        font-size="72" font-weight="800" fill="white">Sianlk</text>
+  <!-- Tagline -->
+  <text x="260" y="300" font-family="SF Pro Display,-apple-system,Helvetica Neue,Arial,sans-serif"
+        font-size="32" font-weight="400" fill="white" opacity="0.9">One Platform. Infinite Possibilities.</text>
+  <!-- Badge -->
+  <rect x="260" y="340" width="220" height="48" rx="24" fill="white" opacity="0.25"/>
+  <text x="370" y="371" font-family="Helvetica Neue,Arial,sans-serif"
+        font-size="20" font-weight="600" fill="white" text-anchor="middle">Available Now</text>
+</svg>

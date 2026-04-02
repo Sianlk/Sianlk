@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "geniai-api"
+version = "1.0.0"
+requires-python = ">=3.12"
+description = "GeniAI Platform FastAPI backend"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["api", "tests"]
+
+[tool.ruff.lint]
+select = ["E","W","F","I","B","C4","UP","S","N","PT"]
+ignore = ["S101","B008","S104"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["api"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = ["-v","--tb=short","--strict-markers"]
+markers = [
+  "slow: tests that take > 1s",
+  "integration: tests requiring real database",
+  "unit: fast unit tests",
+]
+
+[tool.coverage.run]
+source = ["api"]
+omit = ["*/migrations/*","*/tests/*"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = ["pragma: no cover","raise NotImplementedError","if TYPE_CHECKING:"]
+
+[tool.bandit]
+skips = ["B101"]
+targets = ["api"]
+exclude_dirs = ["tests","migrations"]

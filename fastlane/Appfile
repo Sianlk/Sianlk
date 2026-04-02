@@ -1,0 +1,7 @@
+app_identifier("com.sianlk.profile")
+apple_id(ENV["APPLE_ID"])
+team_id(ENV["APPLE_TEAM_ID"])
+itc_team_id(ENV["ITC_TEAM_ID"])
+
+json_key_file(ENV["GOOGLE_PLAY_JSON_KEY"])
+package_name("com.sianlk.profile")

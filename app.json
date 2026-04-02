@@ -1,0 +1,109 @@
+{
+  "expo": {
+    "name": "Sianlk",
+    "slug": "sianlk",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "sianlk",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#EFF6FF"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sianlk.platform",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used for profile photo and document scanning.",
+        "NSMicrophoneUsageDescription": "Used for voice consultations and AI commands.",
+        "NSFaceIDUsageDescription": "Used for secure biometric authentication.",
+        "NSPhotoLibraryUsageDescription": "Used to upload profile photos.",
+        "NSLocationWhenInUseUsageDescription": "Used to find nearby services."
+      },
+      "associatedDomains": [
+        "applinks:sianlk.sianlk.com"
+      ],
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#EFF6FF"
+      },
+      "package": "com.sianlk.platform",
+      "versionCode": 1,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "sianlk.sianlk.com"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "RECORD_AUDIO",
+        "INTERNET",
+        "ACCESS_FINE_LOCATION",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/adaptive-icon.png",
+          "color": "#1D4ED8"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ],
+      "expo-secure-store",
+      "expo-local-authentication"
+    ],
+    "extra": {
+      "apiBaseUrl": "https://api.sianlk.sianlk.com",
+      "appEnv": "production",
+      "eas": {
+        "projectId": "sianlk-sianlk"
+      }
+    },
+    "owner": "sianlk",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/sianlk-sianlk",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 30000
+    }
+  }
+}

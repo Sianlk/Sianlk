@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" width="390" height="844">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F9FAFB;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#F3F4F6;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <rect width="390" height="844" rx="40" fill="#1F2937"/>
+  <rect x="8" y="8" width="374" height="828" rx="34" fill="url(#bg2)"/>
+  <!-- Logo -->
+  <circle cx="195" cy="180" r="44" fill="#1D4ED8"/>
+  <text x="195" y="196" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="36" font-weight="bold" fill="white" text-anchor="middle">S</text>
+  <text x="195" y="248" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#111827" text-anchor="middle">Sianlk</text>
+  <text x="195" y="290" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="26" font-weight="bold" fill="#111827" text-anchor="middle">Sign In</text>
+  <!-- Input fields -->
+  <rect x="24" y="320" width="342" height="52" rx="12" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="44" y="352" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="15" fill="#9CA3AF">Email address</text>
+  <rect x="24" y="384" width="342" height="52" rx="12" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="44" y="416" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="15" fill="#9CA3AF">Password</text>
+  <!-- Sign in button -->
+  <rect x="24" y="460" width="342" height="52" rx="12" fill="#1D4ED8"/>
+  <text x="195" y="492" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Sign In</text>
+  <!-- Caption -->
+  <text x="195" y="620" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#111827" text-anchor="middle">Secure Sign In</text>
+  <text x="195" y="648" font-family="SF Pro Display, Helvetica, Arial, sans-serif" font-size="13" fill="#6B7280" text-anchor="middle">MFA · OAuth · Biometrics</text>
+</svg>

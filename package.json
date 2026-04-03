@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "zustand": "^4.5.2",
+    "zustand": "^5.0.12",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "@react-navigation/bottom-tabs": "^6.5.20",

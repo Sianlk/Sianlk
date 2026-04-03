@@ -1,53 +1,38 @@
-[build-system]
-requires = ["setuptools>=70", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
-
-[project]
-name = "geniai-api"
-version = "1.0.0"
-requires-python = ">=3.12"
-description = "GeniAI Platform FastAPI backend"
-
-[tool.ruff]
-line-length = 100
-target-version = "py312"
-src = ["api", "tests"]
-
-[tool.ruff.lint]
-select = ["E","W","F","I","B","C4","UP","S","N","PT"]
-ignore = ["S101","B008","S104"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["api"]
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "session"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = ["-v","--tb=short","--strict-markers"]
+addopts = "-v --tb=short --strict-markers"
 markers = [
-  "slow: tests that take > 1s",
-  "integration: tests requiring real database",
-  "unit: fast unit tests",
+    "slow: marks tests as slow (deselect with '-m not slow')",
+    "integration: integration tests requiring live services",
 ]
 
-[tool.coverage.run]
-source = ["api"]
-omit = ["*/migrations/*","*/tests/*"]
-branch = true
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+select = ["E", "F", "W", "I", "N", "UP", "S", "B"]
+ignore = ["S101", "B008"]
+exclude = ["alembic/", ".venv/", "node_modules/"]
 
-[tool.coverage.report]
-show_missing = true
-exclude_lines = ["pragma: no cover","raise NotImplementedError","if TYPE_CHECKING:"]
+[tool.ruff.per-file-ignores]
+"tests/*" = ["S101", "S105", "S106"]
 
-[tool.bandit]
-skips = ["B101"]
-targets = ["api"]
-exclude_dirs = ["tests","migrations"]
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+strict = false
+exclude = ["alembic/", "tests/"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "sianlk"
+version = "1.0.0"
+description = "One Platform. Infinite Possibilities."
+requires-python = ">=3.12"
+license = {text = "MIT"}

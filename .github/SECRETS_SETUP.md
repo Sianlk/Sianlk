@@ -1,59 +1,77 @@
-# GitHub Secrets Setup Guide
+# Required GitHub Secrets — Sianlk
 
-Go to each repo: **Settings → Secrets and variables → Actions → New repository secret**
+Configure these at: `https://github.com/Sianlk/Sianlk/settings/secrets/actions`
 
-## Required Secrets
+## App / Mobile
 
-### Core
-| Secret | Value |
-|--------|-------|
-| `SECRET_KEY` | 64+ random chars: `python -c "import secrets; print(secrets.token_hex(32))"` |
-| `DATABASE_URL` | `postgresql+asyncpg://user:pass@host:5432/db` |
-| `REDIS_URL` | `redis://host:6379` |
-| `SENTRY_DSN` | From sentry.io → Project → Settings → SDK Setup |
-| `CODECOV_TOKEN` | From codecov.io → repo settings |
+| Secret | Description | Where to Get |
+|--------|-------------|--------------|
+| `EXPO_TOKEN` | Expo access token for EAS builds | https://expo.dev/accounts/sianlk/settings/access-tokens |
 
-### Stripe
-| Secret | Value |
-|--------|-------|
-| `STRIPE_SECRET_KEY` | From stripe.com → Developers → API keys |
-| `STRIPE_WEBHOOK_SECRET` | From stripe.com → Developers → Webhooks → endpoint secret |
-| `STRIPE_PUBLISHABLE_KEY` | From stripe.com → Developers → API keys |
+## iOS App Store
 
-### iOS App Store
-| Secret | Value |
-|--------|-------|
-| `APPLE_ID` | Your Apple ID email |
-| `APPLE_TEAM_ID` | 10-char Team ID from developer.apple.com |
-| `APP_STORE_CONNECT_API_KEY_ID` | From App Store Connect → Users → Keys |
-| `APP_STORE_CONNECT_API_ISSUER_ID` | Same page as above |
-| `APP_STORE_CONNECT_API_KEY_CONTENT` | Content of .p8 key file |
-| `MATCH_PASSWORD` | Passphrase for Fastlane Match cert encryption |
+| Secret | Description | Where to Get |
+|--------|-------------|--------------|
+| `APPLE_DEV_PORTAL_ID` | Apple Developer account email | Apple Developer Console |
+| `APPLE_ID` | iTunes Connect email | App Store Connect |
+| `APPLE_TEAM_ID` | 10-char team ID | https://developer.apple.com/account |
+| `APP_STORE_CONNECT_TEAM_ID` | ASC team ID | App Store Connect |
+| `APP_STORE_CONNECT_API_KEY_ID` | API key ID | App Store Connect → Users → Keys |
+| `APP_STORE_CONNECT_API_ISSUER_ID` | Issuer ID | App Store Connect → Users → Keys |
+| `APP_STORE_CONNECT_API_KEY_CONTENT` | Private key (.p8 file contents) | App Store Connect → Users → Keys |
 
-### Google Play
-| Secret | Value |
-|--------|-------|
-| `GOOGLE_PLAY_JSON_KEY` | Contents of service account JSON from Play Console |
-| `ANDROID_KEYSTORE_BASE64` | `base64 < release.keystore` |
-| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
-| `ANDROID_KEY_ALIAS` | Key alias |
-| `ANDROID_KEY_PASSWORD` | Key password |
+## Google Play
 
-### OAuth (optional)
-| Secret | Value |
-|--------|-------|
-| `GOOGLE_CLIENT_ID` | From Google Cloud Console → OAuth 2.0 Client IDs |
-| `GOOGLE_CLIENT_SECRET` | Same page |
-| `APPLE_CLIENT_ID` | Service ID from developer.apple.com |
+| Secret | Description | Where to Get |
+|--------|-------------|--------------|
+| `GOOGLE_PLAY_KEY_JSON` | Service account JSON | Google Play Console → Setup → API access |
 
-## Generate Secrets Quickly
+## Backend
+
+| Secret | Description |
+|--------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `REDIS_URL` | Redis connection string |
+| `SECRET_KEY` | 64-char random string (`openssl rand -hex 32`) |
+| `STRIPE_SECRET_KEY` | Stripe secret key (sk_live_...) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `SENTRY_DSN` | Sentry error tracking DSN |
+| `SMTP_HOST` | Email SMTP host |
+| `SMTP_USER` | Email SMTP username |
+| `SMTP_PASS` | Email SMTP password |
+| `GOOGLE_CLIENT_ID` | Google OAuth2 client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret |
+
+## Container Registry
+
+| Secret | Description |
+|--------|-------------|
+| `GHCR_PAT` | GitHub PAT with `write:packages` scope |
+
+## Monitoring
+
+| Secret | Description |
+|--------|-------------|
+| `GRAFANA_PASSWORD` | Grafana admin password |
+| `SLACK_WEBHOOK_URL` | Slack webhook for CI notifications (optional) |
+
+---
+
+## Quick Start
+
 ```bash
-# SECRET_KEY
-python -c "import secrets; print(secrets.token_hex(32))"
+# Generate a secure SECRET_KEY
+openssl rand -hex 32
 
-# Android keystore (one-time)
-keytool -genkey -v -keystore release.keystore -alias app -keyalg RSA -keysize 2048 -validity 10000
+# Test your Stripe webhook locally
+stripe listen --forward-to localhost:8000/api/payments/webhook
 
-# base64 encode keystore
-base64 < release.keystore | tr -d "\n"
+# Run all tests
+make test
+
+# Deploy to production
+docker compose -f docker-compose.prod.yml up -d
+
+# Run migrations
+docker compose -f docker-compose.prod.yml exec api alembic upgrade head
 ```

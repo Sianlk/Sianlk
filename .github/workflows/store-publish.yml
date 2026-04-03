@@ -3,64 +3,60 @@ name: Store Publish
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-
-env:
-  BUNDLE_ID: com.sianlk.profile
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'all'
+        type: choice
+        options: [all, ios, android]
+      profile:
+        description: 'EAS build profile'
+        required: true
+        default: 'production'
+        type: choice
+        options: [development, preview, production]
 
 jobs:
-  test:
+  build-and-submit:
+    name: EAS Build & Submit
     runs-on: ubuntu-latest
+    environment: production
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with: {node-version: '20', cache: npm}
-      - run: npm ci --if-present
-      - run: npm test -- --coverage --passWithNoTests
-      - uses: actions/setup-python@v6
-        with: {python-version: '3.12'}
-      - run: pip install pytest pytest-cov --quiet ; pytest -q --tb=short || true
-      - uses: codecov/codecov-action@v6
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          node-version: '20'
+          cache: 'npm'
 
-  publish-android:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby@v1
-        with: {ruby-version: '3.2', bundler-cache: true}
-      - uses: actions/setup-java@v5
-        with: {distribution: temurin, java-version: '17'}
-      - name: Decode keystore
-        run: echo ${{ secrets.ANDROID_KEYSTORE_BASE64 }} | base64 --decode > android/app/release.keystore
-      - name: Publish to Play Store
-        env:
-          GOOGLE_PLAY_JSON_KEY: ${{ secrets.GOOGLE_PLAY_JSON_KEY }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: bundle exec fastlane android release
+      - name: Install dependencies
+        run: npm ci
 
-  publish-ios:
-    needs: test
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ruby/setup-ruby@v1
-        with: {ruby-version: '3.2', bundler-cache: true}
-      - uses: actions/setup-node@v6
-        with: {node-version: '20', cache: npm}
-      - run: npm ci --if-present
-      - run: cd ios && pod install --repo-update
-      - name: Publish to App Store
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build iOS (production)
+        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'ios'
+        run: |
+          eas build --platform ios --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-        run: bundle exec fastlane ios release
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android (production)
+        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'android'
+        run: |
+          eas build --platform android --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Submit to App Stores
+        if: startsWith(github.ref, 'refs/tags/')
+        run: eas submit --platform all --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

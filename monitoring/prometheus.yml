@@ -1,33 +1,32 @@
-# monitoring/prometheus.yml
 global:
-  scrape_interval:     15s
+  scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    env: production
-
-rule_files:
-  - "alerts.yml"
+    app: 'sianlk'
+    env: 'production'
 
 alerting:
   alertmanagers:
     - static_configs:
-        - targets: ["alertmanager:9093"]
+        - targets: []
+
+rule_files: []
 
 scrape_configs:
-  - job_name: "geniai-api"
+  - job_name: 'api'
     static_configs:
-      - targets: ["api:8000"]
-    metrics_path: "/metrics"
+      - targets: ['api:8000']
+    metrics_path: /metrics
     scheme: http
 
-  - job_name: "prometheus"
+  - job_name: 'nginx'
     static_configs:
-      - targets: ["localhost:9090"]
+      - targets: ['nginx:9113']
 
-  - job_name: "postgres"
+  - job_name: 'postgres'
     static_configs:
-      - targets: ["postgres-exporter:9187"]
+      - targets: ['postgres-exporter:9187']
 
-  - job_name: "redis"
+  - job_name: 'redis'
     static_configs:
-      - targets: ["redis-exporter:9121"]
+      - targets: ['redis-exporter:9121']

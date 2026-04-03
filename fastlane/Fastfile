@@ -1,92 +1,78 @@
-# fastlane/Fastfile
-# Generated for Sianlk — com.sianlk.platform
-
-update_fastlane
-
+# Fastfile for Sianlk
 default_platform(:ios)
 
-APP_IDENTIFIER = "com.sianlk.platform"
-APP_NAME       = "Sianlk"
-SCHEME         = "sianlk"
+before_all do
+  ensure_env_vars(
+    env_vars: ["EXPO_TOKEN"]
+  )
+end
 
 platform :ios do
-  desc "Run iOS tests"
-  lane :test do
-    run_tests(
-      project:       "ios/App.xcodeproj",
-      scheme:        APP_NAME,
-      devices:       ["iPhone 16"],
-      clean:         true,
-      code_coverage: true
-    )
-  end
-
-  desc "Build and upload to TestFlight (beta)"
+  desc "Build and upload to TestFlight"
   lane :beta do
-    ensure_git_status_clean
-    match(type: "appstore", app_identifier: APP_IDENTIFIER, readonly: true)
-    increment_build_number(xcodeproj: "ios/App.xcodeproj")
-    build_app(
-      workspace: "ios/App.xcworkspace",
-      scheme:    APP_NAME,
-      clean:     true,
-      output_directory: "./build",
-      output_name: "Sianlk.ipa"
+    setup_ci if ENV["CI"]
+    build_app_with_eas(
+      platform: "ios",
+      profile: "preview"
     )
-    upload_to_testflight(skip_waiting_for_build_processing: true)
-    slack(message: "Sianlk beta uploaded to TestFlight!") if ENV["SLACK_URL"]
+    upload_to_testflight(
+      api_key_path: "fastlane/app_store_connect_api_key.json",
+      skip_waiting_for_build_processing: true
+    )
+    slack(
+      message: "✅ Sianlk iOS beta build uploaded to TestFlight!",
+      success: true
+    ) if ENV["SLACK_URL"]
   end
 
-  desc "Submit to App Store"
+  desc "Release to App Store"
   lane :release do
-    ensure_git_status_clean
-    match(type: "appstore", app_identifier: APP_IDENTIFIER, readonly: true)
-    increment_build_number(xcodeproj: "ios/App.xcodeproj")
-    build_app(workspace: "ios/App.xcworkspace", scheme: APP_NAME, clean: true)
-    upload_to_app_store(
-      app_identifier:    APP_IDENTIFIER,
-      skip_screenshots:  false,
-      skip_metadata:     false,
-      force:             true,
-      submit_for_review: false,
-      automatic_release: true,
-      precheck_include_in_app_purchases: false
+    setup_ci if ENV["CI"]
+    build_app_with_eas(
+      platform: "ios",
+      profile: "production"
     )
-    slack(message: "Sianlk submitted to App Store!") if ENV["SLACK_URL"]
+    upload_to_app_store(
+      api_key_path: "fastlane/app_store_connect_api_key.json",
+      skip_screenshots: false,
+      screenshots_path: "fastlane/screenshots/ios",
+      metadata_path: "fastlane/metadata/ios",
+      submit_for_review: true,
+      automatic_release: false,
+      force: true
+    )
   end
 end
 
 platform :android do
-  desc "Run Android tests"
-  lane :test do
-    gradle(task: "test", project_dir: "android/")
-  end
-
-  desc "Build and upload AAB to internal track"
+  desc "Build and upload to Google Play Internal Testing"
   lane :beta do
-    ensure_git_status_clean
-    gradle(
-      task: "bundle", build_type: "Release", project_dir: "android/",
-      properties: {
-        "android.injected.signing.store.file"     => ENV["ANDROID_KEYSTORE_FILE"],
-        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
-        "android.injected.signing.key.alias"      => ENV["ANDROID_KEY_ALIAS"],
-        "android.injected.signing.key.password"   => ENV["ANDROID_KEY_PASSWORD"]
-      }
+    setup_ci if ENV["CI"]
+    build_app_with_eas(
+      platform: "android",
+      profile: "preview"
     )
     upload_to_play_store(
       track: "internal",
-      aab: "android/app/build/outputs/bundle/release/app-release.aab",
-      json_key_data: ENV["GOOGLE_PLAY_JSON_KEY"],
-      release_status: "completed"
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
     )
   end
 
-  desc "Promote internal to production"
+  desc "Release to Google Play Production"
   lane :release do
+    setup_ci if ENV["CI"]
+    build_app_with_eas(
+      platform: "android",
+      profile: "production"
+    )
     upload_to_play_store(
-      track: "internal", track_promote_to: "production",
-      json_key_data: ENV["GOOGLE_PLAY_JSON_KEY"], rollout: "0.1"
+      track: "production",
+      metadata_path: "fastlane/metadata/android"
     )
   end
+end
+
+# Helper: build with EAS CLI
+def build_app_with_eas(platform:, profile:)
+  sh("npx eas-cli build --platform #{platform} --profile #{profile} --non-interactive --no-wait")
 end

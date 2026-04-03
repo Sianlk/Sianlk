@@ -1,1 +1,34 @@
-* @OWNER_USERNAME
+# CODEOWNERS — Auto-assign reviewers for pull requests
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for all files
+* @Sianlk
+
+# Backend API
+/app/ @Sianlk
+/tests/ @Sianlk
+/alembic/ @Sianlk
+requirements.txt @Sianlk
+pyproject.toml @Sianlk
+
+# Mobile / React Native
+/src/ @Sianlk
+app.json @Sianlk
+eas.json @Sianlk
+package.json @Sianlk
+
+# CI/CD & Infrastructure
+/.github/ @Sianlk
+/docker-compose*.yml @Sianlk
+/nginx/ @Sianlk
+/monitoring/ @Sianlk
+Dockerfile* @Sianlk
+
+# Fastlane / Store publishing
+/fastlane/ @Sianlk
+Gemfile @Sianlk
+
+# Security-sensitive files
+**/secrets* @Sianlk
+**/.env* @Sianlk
+SECURITY.md @Sianlk

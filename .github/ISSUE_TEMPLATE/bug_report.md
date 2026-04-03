@@ -1,37 +1,35 @@
 ---
 name: Bug Report
-about: AI-triaged bug report — auto-assigned to AI Workforce Engine
-labels: ["bug", "ai-triage"]
-assignees: []
+about: Create a report to help us improve
+title: '[BUG] '
+labels: ['bug', 'needs-triage']
+assignees: 'Sianlk'
 ---
 
-## Describe the Bug
-<!-- A clear and concise description -->
+## Bug Description
+A clear and concise description of what the bug is.
 
 ## Steps to Reproduce
-1.
-2.
-3.
+1. Go to '...'
+2. Click on '...'
+3. Scroll down to '...'
+4. See error
 
 ## Expected Behavior
-<!-- What should happen -->
+A clear and concise description of what you expected to happen.
 
 ## Actual Behavior
-<!-- What actually happens -->
+What actually happened, including any error messages or console output.
+
+## Screenshots
+If applicable, add screenshots to help explain your problem.
 
 ## Environment
-- OS:
-- Browser/App version:
-- Platform version:
+- **Platform**: iOS / Android / Web
+- **OS Version**: [e.g. iOS 17.4, Android 14]
+- **App Version**: [e.g. 1.0.0]
+- **Device**: [e.g. iPhone 15, Pixel 8]
+- **React Native / Expo SDK version**: 
 
-## Logs / Screenshots
-<!-- Attach relevant logs -->
-
-## Severity
-- [ ] P0-CRITICAL (system down)
-- [ ] P1-HIGH (major feature broken)
-- [ ] P2-MEDIUM (minor issue)
-- [ ] P3-LOW (cosmetic)
-
----
-*This ticket will be automatically triaged by the AI Workforce Engine within 5 minutes.*
+## Additional Context
+Add any other context about the problem here.

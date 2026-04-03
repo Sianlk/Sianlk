@@ -1,56 +1,47 @@
 {
   "cli": {
-    "version": ">= 12.0.0",
-    "appVersionSource": "local"
+    "version": ">= 10.0.0"
   },
   "build": {
     "development": {
+      "developmentClient": true,
       "distribution": "internal",
-      "android": {
-        "gradleCommand": ":app:assembleDebug"
-      },
-      "ios": {
-        "buildConfiguration": "Debug"
-      },
       "env": {
-        "APP_ENV": "development"
+        "EXPO_PUBLIC_ENV": "development"
       }
     },
     "preview": {
       "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
       "ios": {
         "simulator": false
       },
       "env": {
-        "APP_ENV": "staging"
+        "EXPO_PUBLIC_ENV": "staging"
       }
     },
     "production": {
       "autoIncrement": true,
-      "android": {
-        "buildType": "app-bundle"
+      "env": {
+        "EXPO_PUBLIC_ENV": "production"
       },
       "ios": {
-        "buildConfiguration": "Release"
+        "resourceClass": "m1-medium"
       },
-      "env": {
-        "APP_ENV": "production"
+      "android": {
+        "buildType": "apk"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "submit@sianlk.com",
-        "ascAppId": "REPLACE_WITH_APP_STORE_ID",
-        "appleTeamId": "REPLACE_WITH_TEAM_ID"
+        "appleId": "APPLE_ID_EMAIL",
+        "ascAppId": "REPLACE_ASC_APP_ID",
+        "appleTeamId": "REPLACE_APPLE_TEAM_ID"
       },
       "android": {
         "serviceAccountKeyPath": "./google-play-key.json",
-        "track": "production"
+        "track": "internal"
       }
     }
   }

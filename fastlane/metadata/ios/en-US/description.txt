@@ -1,1 +1,18 @@
-The official Sianlk platform: a portfolio of world-class AI applications transforming beauty, real estate, development tools, and the future of computing. Explore the full ecosystem of AI innovation.
+Sianlk — One Platform. Infinite Possibilities.
+
+Sianlk is a production-grade AI-powered platform built for reliability, security, and scale.
+
+KEY FEATURES:
+• Secure authentication with MFA and biometrics
+• AI-powered recommendations and automation
+• Real-time WebSocket notifications
+• Stripe-powered subscription management
+• Full GDPR compliance with data export/deletion
+• Offline-capable Progressive Web App
+• End-to-end encrypted communications
+
+SECURITY & PRIVACY:
+Your data is encrypted at rest and in transit. We comply with GDPR, CCPA, and HIPAA guidelines. Full audit logs are maintained for all critical operations.
+
+SUPPORT: https://sianlk.com/support
+PRIVACY: https://sianlk.com/privacy

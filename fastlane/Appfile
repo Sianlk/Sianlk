@@ -1,9 +1,10 @@
-# fastlane/Appfile
+# iOS
 app_identifier("com.sianlk.platform")
-apple_id("submit@sianlk.com")
-itc_team_name("Sianlk Pty Ltd")
-team_name("Sianlk Pty Ltd")
-for_lane(:android) do
-  json_key_file("./google-play-key.json")
-  package_name("com.sianlk.platform")
-end
+apple_dev_portal_id(ENV["APPLE_DEV_PORTAL_ID"])
+itunes_connect_id(ENV["APPLE_ID"])
+team_id(ENV["APPLE_TEAM_ID"])
+itc_team_id(ENV["APP_STORE_CONNECT_TEAM_ID"])
+
+# Android
+json_key_file(ENV["GOOGLE_PLAY_KEY_FILE"] || "fastlane/google-play-key.json")
+package_name("com.sianlk.platform")

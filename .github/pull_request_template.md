@@ -1,29 +1,39 @@
-## Description
-<!-- Describe what this PR does and why -->
+## Summary
+<!-- Describe the changes in this PR in 1-2 sentences -->
 
 ## Type of Change
-- [ ] Bug fix (non-breaking)
-- [ ] New feature (non-breaking)
-- [ ] Breaking change
+- [ ] Bug fix (non-breaking change fixing an issue)
+- [ ] New feature (non-breaking change adding functionality)
+- [ ] Breaking change (fix or feature causing existing functionality to break)
 - [ ] Documentation update
-- [ ] Performance improvement
-- [ ] Security fix
-
-## Testing
-- [ ] Unit tests pass (`pytest`)
-- [ ] Type checks pass (`mypy` / TypeScript)
-- [ ] Lint passes (`ruff` / `eslint`)
-- [ ] Load test within SLA (`k6`)
-- [ ] Manual QA on device/emulator
-
-## Security Checklist
-- [ ] No secrets committed
-- [ ] Input validation on all new endpoints
-- [ ] Auth/authz applied to new routes
-- [ ] No new dependencies with known CVEs
-
-## Screenshots / Video
-<!-- Attach screenshots or a screen recording if UI changed -->
+- [ ] Dependency update
+- [ ] Refactor (no functional change)
+- [ ] CI/CD / Infrastructure
 
 ## Related Issues
-Closes #
+Closes #<!-- issue number -->
+
+## Changes Made
+- 
+- 
+- 
+
+## Testing
+- [ ] Unit tests pass (`pytest` / `jest`)
+- [ ] E2E tests pass
+- [ ] Tested on iOS
+- [ ] Tested on Android
+- [ ] Tested on Web
+
+## Checklist
+- [ ] Code follows project style guidelines (`ruff`/`eslint`)
+- [ ] Self-reviewed the code
+- [ ] Added/updated tests for new functionality
+- [ ] Updated documentation where applicable
+- [ ] No secrets or credentials in code
+- [ ] Breaking changes documented in CHANGELOG.md
+
+## Screenshots (if UI changes)
+| Before | After |
+|--------|-------|
+|        |       |

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/Sianlk
+    about: Browse the full documentation
+  - name: Security Vulnerability
+    url: https://github.com/Sianlk/GeniAi_App_Install/blob/main/SECURITY.md
+    about: Please report security vulnerabilities per our security policy

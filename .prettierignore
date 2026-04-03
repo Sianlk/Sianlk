@@ -1,0 +1,25 @@
+# Build outputs
+dist/
+build/
+.expo/
+android/
+ios/
+
+# Dependencies
+node_modules/
+
+# Generated
+coverage/
+*.min.js
+*.min.css
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+
+# Misc
+.git/

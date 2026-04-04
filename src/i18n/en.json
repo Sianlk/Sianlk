@@ -1,0 +1,37 @@
+{
+  "common": {
+    "ok": "OK", "cancel": "Cancel", "save": "Save", "delete": "Delete",
+    "back": "Back", "next": "Next", "loading": "Loading...",
+    "error": "Something went wrong", "retry": "Retry", "done": "Done"
+  },
+  "auth": {
+    "login": "Sign In", "logout": "Sign Out", "register": "Create Account",
+    "email": "Email address", "password": "Password",
+    "forgotPassword": "Forgot password?", "resetPassword": "Reset Password"
+  },
+  "home": {
+    "greeting": "Hello", "quickActions": "Quick Actions", "recentActivity": "Recent Activity"
+  },
+  "ai": {
+    "thinking": "AI is thinking...", "aiPowered": "AI Powered",
+    "confidence": "Confidence", "reasoning": "Reasoning", "processing": "Processing..."
+  },
+  "features": {    "platform_hub": "Platform Hub",
+    "app_orchestrator": "App Orchestrator",
+    "user_intelligence": "User Intelligence",
+    "ai_dashboard": "AI Dashboard",
+    "unified_inbox": "Unified Inbox",
+    "allFeatures": "All Features"
+  },
+  "profile": {
+    "title": "Profile", "settings": "Settings",
+    "notifications": "Notifications", "privacy": "Privacy",
+    "help": "Help and Support", "version": "Version"
+  },
+  "errors": {
+    "network": "No internet connection",
+    "timeout": "Request timed out",
+    "auth": "Authentication failed",
+    "serverError": "Server error. Please try again."
+  }
+}

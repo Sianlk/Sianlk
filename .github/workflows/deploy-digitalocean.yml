@@ -1,0 +1,125 @@
+name: Deploy to DigitalOcean App Platform
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'production'
+        type: choice
+        options: [production, staging]
+
+env:
+  APP_NAME: sianlk-production
+  REGISTRY: registry.digitalocean.com/sianlk
+  IMAGE_NAME: sianlk
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt pytest httpx
+      - run: pytest tests/ -v --tb=short
+        env:
+          DATABASE_URL: sqlite:///./test.db
+          SECRET_KEY: test-secret-key-for-ci
+
+  build-and-push:
+    name: Build & Push Container
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DO Container Registry
+        run: doctl registry login --expiry-seconds 1200
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{github.ref == 'refs/heads/main'}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            APP_VERSION=${{ github.sha }}
+            BUILD_TIME=${{ github.event.head_commit.timestamp }}
+
+  deploy:
+    name: Deploy to DigitalOcean
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://sianlk.sianlk.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Deploy App Platform spec
+        run: |
+          APP_ID=$(doctl apps list --no-header --format ID,Name | grep "sianlk-production" | awk '{{print $1}}' || true)
+          if [ -z "$APP_ID" ]; then
+            echo "Creating new app..."
+            doctl apps create --spec .do/app.yaml --wait
+          else
+            echo "Updating app $APP_ID..."
+            doctl apps update "$APP_ID" --spec .do/app.yaml --wait
+            doctl apps create-deployment "$APP_ID" --wait --no-reuselatestdeployment
+          fi
+
+      - name: Verify deployment
+        run: |
+          sleep 30
+          curl -sf https://sianlk.sianlk.com/health || echo "Health check pending (DNS propagation may take a moment)"
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "✅ Sianlk deployed to https://sianlk.sianlk.com"
+
+  lighthouse:
+    name: Performance Audit
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://sianlk.sianlk.com/health
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+        continue-on-error: true

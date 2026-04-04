@@ -1,129 +1,115 @@
-<div align="center">
+# Sianlk — Unified Sianlk AI platform
 
-<img src="assets/graphics/icon-1024.svg" width="120" alt="Sianlk Icon" />
+![Version](https://img.shields.io/badge/version-1.1.0-blue?style=flat-square)
+![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android%20%7C%20Web-1D4ED8.svg?style=flat-square)
+![AI](https://img.shields.io/badge/AI-GPT--4o%20%7C%20Claude-%238B5CF6?style=flat-square)
+![Deploy](https://img.shields.io/badge/deploy-DigitalOcean-0080FF?style=flat-square&logo=digitalocean)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
+[![CI](https://github.com/Sianlk/sianlk/workflows/backend-ci/badge.svg)](https://github.com/Sianlk/sianlk/actions)
 
-# Sianlk
-
-### One Platform. Infinite Possibilities.
-
-[![CI](https://github.com/Sianlk/Sianlk/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/Sianlk/Sianlk/actions/workflows/backend-ci.yml)
-[![Security Scan](https://github.com/Sianlk/Sianlk/actions/workflows/security-scan.yml/badge.svg)](https://github.com/Sianlk/Sianlk/actions/workflows/security-scan.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-iOS%20|%20Android-lightgrey.svg)](https://sianlk.com)
-[![FastAPI](https://img.shields.io/badge/backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com)
-[![React Native](https://img.shields.io/badge/mobile-React%20Native-61DAFB.svg)](https://reactnative.dev)
-
-**AI, SaaS, business platform**
-
-[Website](https://sianlk.com) · [Privacy Policy](https://sianlk.com/privacy) · [Support](https://sianlk.com/support)
-
-</div>
-
----
-
-## Overview
-
-**Sianlk** — One Platform. Infinite Possibilities.
-
-Built on a production-grade stack: FastAPI (Python 3.12) backend + React Native (Expo) mobile app, with full authentication, payments, observability, and App Store deployment pipelines.
+> **Unified Sianlk AI platform** — Built by [Sianlk](https://sianlk.com) using proprietary AI workforce technology.
 
 ## Features
-
-- **AI-Powered Core** — Intelligent automation and recommendations tailored to AI
-- **Secure Auth** — Email/password + TOTP MFA + Google Sign-In + Apple Sign In
-- **Stripe Payments** — Subscription tiers with customer portal and webhook handling
-- **Real-time** — WebSocket notifications and live data streaming
-- **GDPR Compliant** — Data export, deletion, cookie consent (Articles 17 & 20)
-- **PWA Ready** — Service Worker, offline support, installable web app
-- **Observability** — Prometheus metrics, OpenTelemetry tracing, structured JSON logging
-- **App Store Ready** — Fastlane automation for iOS TestFlight and Google Play deployment
+`Platform Hub` `App Orchestrator` `User Intelligence` `AI Dashboard` `Unified Inbox`
 
 ## Tech Stack
 
-| Layer       | Technology                                  |
-|-------------|---------------------------------------------|
-| Mobile      | React Native · Expo · TypeScript · Zustand  |
-| Backend     | FastAPI · Python 3.12 · async SQLAlchemy    |
-| Database    | PostgreSQL 16 · Alembic migrations          |
-| Cache       | Redis 7                                     |
-| Auth        | JWT · TOTP MFA · OAuth2 (Google + Apple)    |
-| Payments    | Stripe Subscriptions + Webhooks             |
-| Infra       | Docker · nginx · GitHub Actions CI/CD       |
-| Monitoring  | Prometheus · OpenTelemetry · Sentry         |
+| Layer | Technology |
+|-------|-----------|
+| Mobile | React Native + Expo SDK 52, Expo Router v4 |
+| AI Engine | GPT-4o, Claude 3.5 Sonnet, Custom embeddings |
+| AI Workforce | Proprietary multi-agent orchestration |
+| Backend | FastAPI 0.115, Python 3.12, PostgreSQL 16, Redis 7 |
+| Infrastructure | DigitalOcean App Platform + Container Registry |
+| Monitoring | Sentry, Prometheus, Grafana |
+| CI/CD | GitHub Actions → DigitalOcean (auto-deploy on push) |
 
 ## Quick Start
 
 ```bash
-# Clone the repo
-git clone https://github.com/Sianlk/Sianlk.git
-cd Sianlk
-
-# Backend
-cp .env.example .env        # Fill in your secrets
-docker compose up -d        # Starts API + PostgreSQL + Redis + nginx
-
-# Run DB migrations
-docker compose exec api alembic upgrade head
-
 # Mobile
 npm install
 npx expo start
+
+# Backend  
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+
+# Deploy to DigitalOcean
+doctl auth init
+bash .do/deploy.sh
 ```
 
-## Project Structure
+## DigitalOcean Deployment
 
+This app is pre-configured for instant DigitalOcean App Platform deployment:
+
+1. **Create DO account**: https://cloud.digitalocean.com
+2. **Install doctl**: `brew install doctl` (macOS) or see [docs](https://docs.digitalocean.com/reference/doctl/)
+3. **Authenticate**: `doctl auth init`
+4. **Deploy**: `bash .do/deploy.sh`
+
+Or import `.do/app.yaml` directly in the DigitalOcean console.
+
+**Required Secrets** (set in DO App Platform dashboard):
+- `DATABASE_URL` — PostgreSQL connection string
+- `SECRET_KEY` — 64-char random string
+- `OPENAI_API_KEY` — OpenAI API key
+- `SENTRY_DSN` — Sentry project DSN
+
+## API Documentation
+
+Live API docs: `https://sianlk.sianlk.com/docs`
+
+### Key Endpoints
 ```
-Sianlk/
-├── api/                    # FastAPI backend
-│   ├── core/               # Config, DB, security, metrics, telemetry
-│   ├── models/             # SQLAlchemy models
-│   ├── routes/             # Auth, users, payments, GDPR, WebSocket
-│   └── middleware/         # Security headers, rate limiting
-├── src/                    # React Native app
-│   ├── api/                # Typed fetch client with JWT refresh
-│   ├── hooks/              # useAuth hook
-│   ├── navigation/         # App, Auth, and Tab navigators
-│   ├── screens/            # Login, Register, Home, Profile, Settings
-│   └── store/              # Zustand auth store
-├── fastlane/               # App Store & Google Play automation
-│   ├── metadata/           # Store listing copy
-│   └── screenshots/        # Store screenshots (SVG)
-├── assets/                 # Branding: icons, splash, feature graphic
-├── public/                 # PWA: favicon, manifest, service worker
-├── tests/                  # pytest async test suite
-├── alembic/                # Database migrations
-├── k8s/                    # Kubernetes manifests
-├── .github/                # CI/CD workflows, SECRETS_SETUP.md
-└── docker-compose.yml
-```
-
-## App Store Deployment
-
-```bash
-# iOS — Upload to TestFlight
-fastlane ios beta
-
-# Android — Upload to Google Play Internal Testing
-fastlane android beta
+GET  /health              — Health check
+GET  /                    — Service info  
+POST /api/ai/complete     — AI completion (domain: platform)
+POST /api/ai/agent        — AI workforce agent task
+WS   /ws/ai               — Real-time AI streaming
+POST /api/analytics/batch — Analytics ingestion
+POST /api/users/push-token — Push notification registration
 ```
 
-See `.github/APP_STORE_CHECKLIST.md` for pre-submission requirements and `.github/SECRETS_SETUP.md` for required secrets.
+## Architecture
 
-## Security
+```
+Mobile (Expo Router)
+  ├── app/(tabs)/index.tsx  — AI-powered home
+  ├── app/(tabs)/ai.tsx     — AI Workforce agents
+  ├── src/agents/           — AIWorkforceAgent
+  ├── src/services/         — AI, Analytics, Notifications
+  └── src/theme/            — Design system
 
-- Stripe webhook signatures verified (HMAC-SHA256)
-- JWT tokens with short expiry + refresh rotation
-- bcrypt password hashing
-- Rate limiting (100 req/60s sliding window)
-- Security headers: CSP, HSTS, X-Frame-Options, COOP, COEP
-- Weekly Bandit SAST, Safety CVE, Trivy container scan, Gitleaks
+Backend (FastAPI)
+  ├── app/main.py           — Routes + WebSocket
+  ├── alembic/              — DB migrations
+  └── tests/                — pytest suite
+
+Infrastructure
+  ├── .do/app.yaml          — DO App Platform spec
+  ├── .do/deploy.sh         — One-click deploy
+  ├── k8s/                  — Kubernetes manifests
+  ├── Dockerfile            — Production container
+  └── docker-compose.yml    — Local development
+```
+
+## AI Workforce System
+
+Sianlk uses proprietary AI workforce agents (created by Sianlk):
+
+- **Analyst Agent** — Expert platform analysis with reasoning chains
+- **Advisor Agent** — Strategic recommendations and forecasting
+- **Automator Agent** — Autonomous task execution for platform workflows
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). All contributions welcome!
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+MIT © [Sianlk Ltd](https://sianlk.com)
 
 ---
-
-<div align="center">
-Built with ❤️ by <a href="https://sianlk.com">Sianlk</a>
-</div>
+*Sianlk is built by Sianlk — pioneer in AI-powered platform technology.*

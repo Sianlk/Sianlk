@@ -1,59 +1,68 @@
-/**
- * React Native deep link + Universal Link handler.
- * Registers for both http:// (Universal Links / App Links) and custom scheme.
- */
-import {Linking, Alert} from 'react-native';
-import {NavigationContainerRef} from '@react-navigation/native';
+// Deep Link Configuration — Sianlk
+// Universal Links (iOS) + App Links (Android)
 
-type LinkHandler = (params: Record<string, string>) => void;
+import * as Linking from 'expo-linking';
+import { router } from 'expo-router';
+import Analytics from '../services/analytics';
 
-const _handlers: Map<string, LinkHandler> = new Map();
+const BASE_URL = 'https://sianlk.sianlk.com';
 
-export function registerDeepLinkHandler(path: string, handler: LinkHandler) {
-  _handlers.set(path, handler);
+export const LINK_SCHEMES = [
+  `${BASE_URL}`,
+  `sianlk://sianlk`,
+];
+
+export interface DeepLinkRoute {
+  pattern: string;
+  screen: string;
+  params?: Record<string, string>;
 }
 
-export function initDeepLinks(navigationRef: React.RefObject<NavigationContainerRef<any>>) {
-  // Handle link when app is already open
-  const subscription = Linking.addEventListener("url", ({url}) => {
-    handleUrl(url, navigationRef);
-  });
+export const DEEP_LINK_ROUTES: DeepLinkRoute[] = [
+  { pattern: '/',                    screen: '/(tabs)/' },
+  { pattern: '/login',               screen: '/(auth)/login' },
+  { pattern: '/ai',                  screen: '/(tabs)/ai' },
+  { pattern: '/profile',             screen: '/(tabs)/profile' },
+  { pattern: '/explore',             screen: '/(tabs)/explore' },
+  { pattern: '/onboarding',          screen: '/onboarding' },
+  { pattern: '/reset-password',      screen: '/(auth)/reset-password' },
+  { pattern: '/upgrade',             screen: '/paywall' },
+  { pattern: '/share/:id',           screen: '/(tabs)/ai' },
+];
 
-  // Handle initial link (app opened via link)
-  Linking.getInitialURL().then((url) => {
-    if (url) handleUrl(url, navigationRef);
-  });
-
-  return () => subscription.remove();
+export function createShareLink(type: string, id: string): string {
+  return `${BASE_URL}/share/${id}?type=${type}&app=sianlk`;
 }
 
-function handleUrl(url: string, navigationRef: React.RefObject<NavigationContainerRef<any>>) {
-  try {
-    // Parse both https://domain.com/path and app://path
-    const parsed = url.includes("://") ? new URL(url) : null;
-    if (!parsed) return;
+export function createDeepLink(path: string): string {
+  return Linking.createURL(path);
+}
 
-    const path = parsed.pathname;
-    const params: Record<string, string> = {};
-    parsed.searchParams.forEach((value, key) => { params[key] = value; });
+export function handleDeepLink(url: string): void {
+  const parsed = Linking.parse(url);
+  Analytics.track('deep_link_opened', {
+    url: url.substring(0, 100),
+    path: parsed.path ?? '',
+    scheme: parsed.scheme ?? '',
+  });
 
-    // Route to registered handlers
-    for (const [pattern, handler] of _handlers.entries()) {
-      if (path.startsWith(pattern)) {
-        handler({...params, _path: path});
-        return;
-      }
-    }
+  const path = parsed.path ?? '/';
+  const matchedRoute = DEEP_LINK_ROUTES.find(r =>
+    path === r.pattern || path.startsWith(r.pattern.split(':')[0])
+  );
 
-    // Default: navigate to matched screen
-    if (navigationRef.current?.isReady()) {
-      if (path.startsWith("/auth/reset-password")) {
-        navigationRef.current.navigate("ResetPassword" as never, params as never);
-      } else if (path.startsWith("/share/")) {
-        navigationRef.current.navigate("Share" as never, params as never);
-      }
-    }
-  } catch (err) {
-    console.warn("Deep link parse error:", err);
+  if (matchedRoute) {
+    router.push(matchedRoute.screen as any);
+  } else {
+    router.push('/(tabs)/');
   }
 }
+
+export function useDeepLinks() {
+  return {
+    subscribe: () => Linking.addEventListener('url', ({ url }) => handleDeepLink(url)),
+    getInitialURL: () => Linking.getInitialURL(),
+  };
+}
+
+export default { createShareLink, createDeepLink, handleDeepLink, useDeepLinks };

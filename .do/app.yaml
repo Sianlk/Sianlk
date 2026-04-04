@@ -1,0 +1,90 @@
+# DigitalOcean App Platform spec — Sianlk
+# Deploy: https://cloud.digitalocean.com/apps/new (import this file)
+# Docs: https://docs.digitalocean.com/products/app-platform/reference/app-spec/
+
+name: sianlk-production
+region: nyc
+features:
+  - buildpack-stack=ubuntu-22
+
+services:
+  - name: api
+    github:
+      repo: Sianlk/sianlk
+      branch: main
+      deploy_on_push: true
+    build_command: pip install -r requirements.txt
+    run_command: uvicorn app.main:app --host 0.0.0.0 --port 8080 --workers 2
+    source_dir: /
+    http_port: 8080
+    instance_count: 2
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: OPENAI_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: REDIS_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: SENTRY_DSN
+        scope: RUN_TIME
+        type: SECRET
+      - key: ENVIRONMENT
+        scope: RUN_TIME
+        value: production
+      - key: APP_NAME
+        scope: RUN_TIME
+        value: "Sianlk"
+      - key: APP_DOMAIN
+        scope: RUN_TIME
+        value: "platform"
+      - key: CORS_ORIGINS
+        scope: RUN_TIME
+        value: "https://sianlk.sianlk.com,https://app.sianlk.com"
+    routes:
+      - path: /
+
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    size: db-s-dev-database
+    num_nodes: 1
+
+  - name: cache
+    engine: REDIS
+    version: "7"
+    size: db-s-dev-database
+    num_nodes: 1
+
+domains:
+  - domain: sianlk.sianlk.com
+    type: PRIMARY
+    zone: sianlk.com
+
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+  - rule: CPU_UTILIZATION
+    value: 80
+    operator: GREATER_THAN
+    window: FIVE_MINUTES
+    disabled: false
+  - rule: MEM_UTILIZATION
+    value: 85
+    operator: GREATER_THAN
+    window: FIVE_MINUTES
+    disabled: false

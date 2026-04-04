@@ -1,0 +1,79 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "done": "Done",
+    "search": "Search",
+    "filter": "Filter",
+    "share": "Share",
+    "close": "Close"
+  },
+  "auth": {
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "register": "Create Account",
+    "email": "Email address",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset Password",
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create your account",
+    "alreadyMember": "Already a member?",
+    "noAccount": "Don\'t have an account?"
+  },
+  "home": {
+    "greeting": "Hello",
+    "aiAssistant": "AI Assistant",
+    "askAnything": "Ask me anything about platform...",
+    "quickActions": "Quick Actions",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No recent activity"
+  },
+  "ai": {
+    "thinking": "AI is thinking...",
+    "generating": "Generating response...",
+    "aiPowered": "AI Powered",
+    "askAI": "Ask Sianlk AI",
+    "suggestions": "AI Suggestions",
+    "confidence": "Confidence",
+    "reasoning": "Reasoning",
+    "actions": "Actions taken",
+    "analysing": "Analysing...",
+    "processing": "Processing...",
+    "domain": "platform"
+  },
+  "features": {
+    "platform_hub": "Platform Hub",
+    "app_orchestrator": "App Orchestrator",
+    "user_intelligence": "User Intelligence",
+    "ai_dashboard": "AI Dashboard",
+    "unified_inbox": "Unified Inbox",
+    "allFeatures": "All Features"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "help": "Help & Support",
+    "about": "About Sianlk",
+    "version": "Version"
+  },
+  "errors": {
+    "network": "No internet connection",
+    "timeout": "Request timed out",
+    "auth": "Authentication failed",
+    "permission": "Permission denied",
+    "notFound": "Not found",
+    "serverError": "Server error. Please try again."
+  }
+}

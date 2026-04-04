@@ -2,82 +2,59 @@
   "expo": {
     "name": "Sianlk",
     "slug": "sianlk",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
-    "icon": "./assets/graphics/icon-1024.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/graphics/splash.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1D4ED8"
+      "backgroundColor": "#1E40AF"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sianlk.platform",
+      "bundleIdentifier": "com.sianlk.sianlk",
       "buildNumber": "1",
       "infoPlist": {
-        "NSCameraUsageDescription": "Used for profile photo",
-        "NSFaceIDUsageDescription": "Used for biometric login",
-        "NSPhotoLibraryUsageDescription": "Used for profile photo"
+        "NSCameraUsageDescription": "Camera access for AI analysis",
+        "NSMicrophoneUsageDescription": "Voice input for AI assistant",
+        "NSPhotoLibraryUsageDescription": "Photo access for AI features"
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/graphics/adaptive-icon.png",
-        "backgroundColor": "#1D4ED8"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1E40AF"
       },
-      "package": "com.sianlk.platform",
-      "versionCode": 1,
-      "permissions": [
-        "USE_BIOMETRIC",
-        "USE_FINGERPRINT",
-        "CAMERA"
-      ],
-      "googleServicesFile": "./google-services.json"
+      "package": "com.sianlk.sianlk",
+      "versionCode": 2,
+      "permissions": ["CAMERA", "RECORD_AUDIO", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "VIBRATE", "RECEIVE_BOOT_COMPLETED"]
     },
     "web": {
-      "favicon": "./public/favicon.ico",
+      "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router",
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/graphics/icon-1024.png"
-        }
-      ],
-      "expo-secure-store",
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
-      ]
+      ["expo-router", {"origin": "https://sianlk.sianlk.com"}],
+      ["expo-notifications", {"icon": "./assets/icon.png", "color": "#1D4ED8", "sounds": ["./assets/notification.wav"]}],
+      ["expo-secure-store"],
+      ["expo-build-properties", {"ios": {"newArchEnabled": true}, "android": {"newArchEnabled": true}}],
+      ["@sentry/react-native/expo", {"organization": "sianlk", "project": "sianlk"}]
     ],
-    "scheme": "sianlk",
-    "experiments": {
-      "typedRoutes": true
-    },
     "extra": {
-      "apiUrl": "https://api.sianlk.com",
-      "eas": {
-        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
-      }
-    },
-    "owner": "sianlk",
-    "updates": {
-      "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/REPLACE_WITH_EAS_PROJECT_ID"
+      "router": {"origin": "https://sianlk.sianlk.com"},
+      "eas": {"projectId": "00000000-0000-0000-0000-000000000000"}
     },
     "runtimeVersion": {
-      "policy": "sdkVersion"
-    }
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/00000000-0000-0000-0000-000000000000",
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "ON_LOAD"
+    },
+    "owner": "sianlk"
   }
 }

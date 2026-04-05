@@ -1,7 +1,7 @@
 # Sianlk Unified SaaS — DigitalOcean App Platform
-# $5/month: 512 MB RAM, 1 vCPU, shared database
-# Serves ALL 11 apps from one container
-# Import at: https://cloud.digitalocean.com/apps/new
+# $5/month: apps-s-1vcpu-0.5gb (512 MB, 1 vCPU)
+# SQLite = no managed-DB cost — all 11 apps share one container
+# Import at: https://cloud.digitalocean.com/apps/new?repo=Sianlk/Sianlk
 
 name: sianlk-unified
 region: nyc
@@ -18,14 +18,14 @@ services:
     instance_size_slug: apps-s-1vcpu-0.5gb
     health_check:
       http_path: /health
-      initial_delay_seconds: 15
-      period_seconds: 10
+      initial_delay_seconds: 20
+      period_seconds: 15
       timeout_seconds: 5
       failure_threshold: 3
     envs:
       - key: DATABASE_URL
         scope: RUN_TIME
-        type: SECRET
+        value: sqlite+aiosqlite:///./sianlk.db
       - key: SECRET_KEY
         scope: RUN_TIME
         type: SECRET
@@ -46,16 +46,13 @@ services:
         value: production
       - key: CORS_ORIGINS
         scope: RUN_TIME
-        value: "https://sianlk.com,https://app.sianlk.com,https://aiblty.sianlk.com,https://buildquote.sianlk.com,https://comppropdata.sianlk.com,https://geniqx.sianlk.com,https://gitgit.sianlk.com,https://terminalai.sianlk.com,https://aiaesthetics.sianlk.com,https://aib.sianlk.com"
-    routes:
-      - path: /
-
-databases:
-  - name: sianlk-db
-    engine: PG
-    version: "16"
-    size: db-s-dev-database
-    num_nodes: 1
+        value: >-
+          https://sianlk.com,https://app.sianlk.com,
+          https://aiblty.sianlk.com,https://buildquote.sianlk.com,
+          https://comppropdata.sianlk.com,https://geniqx.sianlk.com,
+          https://gitgit.sianlk.com,https://terminalai.sianlk.com,
+          https://aiaesthetics.sianlk.com,https://aib.sianlk.com,
+          https://geniai.sianlk.com
 
 alerts:
   - rule: DEPLOYMENT_FAILED

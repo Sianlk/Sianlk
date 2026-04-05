@@ -1,54 +1,37 @@
 version: "3.9"
+
 services:
   api:
     build: .
-    ports: ["8000:8000"]
+    ports:
+      - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/appdb
-      - REDIS_URL=redis://cache:6379
-    env_file: [".env"]
+      DATABASE_URL: postgresql+asyncpg://sianlk:sianlk@db:5432/sianlk
+      SECRET_KEY: dev-secret-key-change-in-production
+      ENVIRONMENT: development
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:8081,exp://localhost:8081"
     depends_on:
-      db: {condition: service_healthy}
-      cache: {condition: service_healthy}
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: appdb
-    volumes: ["pgdata:/var/lib/postgresql/data"]
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  cache:
-    image: redis:7-alpine
-    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --requirepass redis_password
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  nginx:
-    image: nginx:alpine
-    ports: ["80:80", "443:443"]
+      POSTGRES_USER: sianlk
+      POSTGRES_PASSWORD: sianlk
+      POSTGRES_DB: sianlk
+    ports:
+      - "5432:5432"
     volumes:
-      - "./nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
-      - "./nginx/ssl:/etc/nginx/ssl:ro"
-    depends_on: [api]
-    restart: unless-stopped
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sianlk"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   pgdata:

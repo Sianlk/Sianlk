@@ -1,39 +1,33 @@
-name: CI/CD — Build, Test & Deploy
+name: CI/CD — Build, Test & Deploy to DigitalOcean
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
-    name: Test
+    name: Run Tests
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: sianlk
-          POSTGRES_PASSWORD: sianlk
-          POSTGRES_DB: sianlk_test
-        ports: ["5432:5432"]
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt pytest pytest-asyncio httpx aiosqlite
-      - run: pytest tests/ -v --tb=short
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest pytest-asyncio httpx aiosqlite
+      - name: Run tests
+        run: pytest tests/ -v --tb=short
         env:
           DATABASE_URL: sqlite+aiosqlite:///./test.db
-          SECRET_KEY: test-secret-key-64-chars-ci-pipeline-minimum-length
+          SECRET_KEY: test-secret-key-for-ci-minimum-64-characters-required-here
           ENVIRONMENT: test
 
-  build-and-deploy:
-    name: Build & Deploy
+  deploy:
+    name: Deploy to DigitalOcean
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -48,19 +42,30 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Deploy to App Platform
+      - name: Deploy app
         run: |
-          APP_ID=$(doctl apps list --no-header --format ID,Name 2>/dev/null | grep "sianlk-unified" | awk '{print $1}' || true)
+          set -euo pipefail
+          APP_ID=$(doctl apps list --no-header --format ID,Spec.Name 2>/dev/null \
+                   | grep "sianlk-unified" | awk '{print $1}' || true)
           if [ -z "$APP_ID" ]; then
-            echo "Creating app..."
+            echo "Creating app from spec..."
             doctl apps create --spec .do/app.yaml --wait
+            APP_ID=$(doctl apps list --no-header --format ID,Spec.Name \
+                     | grep "sianlk-unified" | awk '{print $1}')
           else
             echo "Updating app $APP_ID..."
-            doctl apps update "$APP_ID" --spec .do/app.yaml --wait
-            doctl apps create-deployment "$APP_ID" --wait --no-reuselatestdeployment
+            doctl apps update "$APP_ID" --spec .do/app.yaml
           fi
+          echo "Deploying $APP_ID..."
+          doctl apps create-deployment "$APP_ID" --wait
+          echo "APP_ID=$APP_ID" >> $GITHUB_OUTPUT
 
       - name: Health check
         run: |
-          sleep 20
-          curl -sf https://sianlk.com/health || echo "Health check pending"
+          sleep 10
+          for i in $(seq 1 5); do
+            STATUS=$(curl -sf https://sianlk.com/health 2>/dev/null || echo "pending")
+            echo "Attempt $i: $STATUS"
+            [ "$STATUS" != "pending" ] && break
+            sleep 15
+          done

@@ -1,24 +1,25 @@
 # Sianlk Unified SaaS Backend
-# Single FastAPI instance serving all 11 apps
-# Optimised for DigitalOcean $5 droplet (512 MB RAM)
+# Optimised for DigitalOcean Apps basic-xxs (512 MB RAM, 1 vCPU)
+# True $5/mo: SQLite (aiosqlite) - no managed database needed
 
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 pydantic==2.9.2
 pydantic-settings==2.5.2
 
-# Database (async)
+# Database — async SQLite (free, no addon) OR swap DATABASE_URL for postgres
 sqlalchemy[asyncio]==2.0.36
+aiosqlite==0.20.0
 alembic==1.13.3
+
+# PostgreSQL driver (optional — used if DATABASE_URL=postgresql+asyncpg://...)
 asyncpg==0.29.0
 
 # Auth & Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.12
-
-# Cache
-redis==5.1.1
+email-validator==2.2.0
 
 # AI
 openai==1.51.0

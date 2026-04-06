@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "GeniQX",
+    "slug": "geniqx",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0F"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sianlk.geniqx",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "GeniQX uses camera for AI-powered features",
+        "NSMicrophoneUsageDescription": "GeniQX uses microphone for voice input",
+        "NSPhotoLibraryUsageDescription": "GeniQX accesses photos for AI analysis"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0A0A0F"
+      },
+      "package": "com.sianlk.geniqx",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      "expo-linear-gradient",
+      "expo-blur"
+    ],
+    "extra": {
+      "apiBase": "https://sianlk-unified-9w6jz.ondigitalocean.app",
+      "appSlug": "geniqx",
+      "proPriceUsd": 34.99,
+      "eas": {
+        "projectId": "sianlk-geniqx-001"
+      }
+    },
+    "owner": "sianlk"
+  }
+}

@@ -10,7 +10,7 @@ pydantic-settings==2.5.2
 # Database — async SQLite (free, no addon) OR swap DATABASE_URL for postgres
 sqlalchemy[asyncio]==2.0.36
 aiosqlite==0.20.0
-alembic==1.13.3
+alembic==1.18.4
 
 # PostgreSQL driver (optional — used if DATABASE_URL=postgresql+asyncpg://...)
 asyncpg==0.29.0

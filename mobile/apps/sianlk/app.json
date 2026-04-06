@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "Sianlk Hub",
+    "slug": "sianlk",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0F"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sianlk.hub",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Sianlk Hub uses camera for AI-powered features",
+        "NSMicrophoneUsageDescription": "Sianlk Hub uses microphone for voice input",
+        "NSPhotoLibraryUsageDescription": "Sianlk Hub accesses photos for AI analysis"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0A0A0F"
+      },
+      "package": "com.sianlk.hub",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      "expo-linear-gradient",
+      "expo-blur"
+    ],
+    "extra": {
+      "apiBase": "https://sianlk-unified-9w6jz.ondigitalocean.app",
+      "appSlug": "sianlk",
+      "proPriceUsd": 4.99,
+      "eas": {
+        "projectId": "sianlk-sianlk-001"
+      }
+    },
+    "owner": "sianlk"
+  }
+}

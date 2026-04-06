@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "AIB",
+    "slug": "aib",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0F"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sianlk.aib",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "AIB uses camera for AI-powered features",
+        "NSMicrophoneUsageDescription": "AIB uses microphone for voice input",
+        "NSPhotoLibraryUsageDescription": "AIB accesses photos for AI analysis"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0A0A0F"
+      },
+      "package": "com.sianlk.aib",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      "expo-linear-gradient",
+      "expo-blur"
+    ],
+    "extra": {
+      "apiBase": "https://sianlk-unified-9w6jz.ondigitalocean.app",
+      "appSlug": "aib",
+      "proPriceUsd": 14.99,
+      "eas": {
+        "projectId": "sianlk-aib-001"
+      }
+    },
+    "owner": "sianlk"
+  }
+}

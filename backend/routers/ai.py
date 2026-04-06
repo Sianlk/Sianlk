@@ -87,7 +87,15 @@ async def complete(
             yield "data: [DONE]\n\n"
         return StreamingResponse(generate(), media_type="text/event-stream")
 
-    resp = await client.chat.completions.create(model=req.model, messages=messages, max_tokens=2048)
+    try:
+        resp = await client.chat.completions.create(model=req.model, messages=messages, max_tokens=2048)
+    except openai.RateLimitError as e:
+        raise HTTPException(status_code=429, detail=f"OpenAI quota/rate limit: {str(e)}")
+    except openai.AuthenticationError as e:
+        raise HTTPException(status_code=401, detail=f"OpenAI authentication failed: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {str(e)}")
+
     content = resp.choices[0].message.content
     duration_ms = int((time.monotonic() - t0) * 1000)
     log = AILog(
@@ -117,10 +125,18 @@ async def run_agent(
         "automator": f"You are an expert {req.app_slug} Automator. Create executable step-by-step plans.",
     }
     system = agent_personas.get(req.agent_type, agent_personas["analyst"])
-    resp = await client.chat.completions.create(
-        model="gpt-4o-mini", max_tokens=1024,
-        messages=[{"role": "system", "content": system}, {"role": "user", "content": req.task}]
-    )
+    try:
+        resp = await client.chat.completions.create(
+            model="gpt-4o-mini", max_tokens=1024,
+            messages=[{"role": "system", "content": system}, {"role": "user", "content": req.task}]
+        )
+    except openai.RateLimitError as e:
+        raise HTTPException(status_code=429, detail=f"OpenAI quota/rate limit: {str(e)}")
+    except openai.AuthenticationError as e:
+        raise HTTPException(status_code=401, detail=f"OpenAI authentication failed: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {str(e)}")
+
     result = resp.choices[0].message.content
     log = AILog(user_id=current_user.id, app_slug=req.app_slug, model="gpt-4o-mini",
                 prompt_tokens=resp.usage.prompt_tokens, completion_tokens=resp.usage.completion_tokens)

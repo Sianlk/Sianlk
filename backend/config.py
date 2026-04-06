@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     def allowed_origins(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",")]
 
+    admin_email: str = ""
     model_config = {"env_file": ".env", "extra": "ignore"}
 
 @lru_cache

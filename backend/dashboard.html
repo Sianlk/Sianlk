@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sianlk Platform</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;--card:#13131a;--border:#1e1e2e;
+  --accent:#7c3aed;--accent2:#06b6d4;
+  --text:#e2e8f0;--muted:#64748b;
+  --green:#10b981;--red:#ef4444;--yellow:#f59e0b;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh}
+a{color:var(--accent2);text-decoration:none}
+
+/* ── NAV ───────────────────────────── */
+nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:100}
+.logo{font-size:1.2rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.logo-text{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:2px}
+.nav-btn{background:none;border:none;color:var(--muted);padding:7px 14px;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:500;transition:.15s}
+.nav-btn:hover,.nav-btn.active{background:var(--border);color:var(--text)}
+.nav-right{display:flex;gap:8px;align-items:center}
+
+/* ── BUTTONS ───────────────────────── */
+.btn{padding:9px 20px;border-radius:8px;border:none;font-size:.875rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#6d28d9}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}.btn-ghost:hover{background:var(--border)}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.btn-store{background:#1a1a2e;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 13px;font-size:.78rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-weight:500;transition:.15s}
+.btn-store:hover{border-color:var(--accent2);color:var(--accent2)}
+.btn-store span{font-size:1rem}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--border);padding:5px 14px 5px 6px;border-radius:20px;font-size:.8rem;font-weight:600}
+.avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#fff;flex-shrink:0}
+
+/* ── HERO ───────────────────────────── */
+.hero{text-align:center;padding:72px 24px 52px;max-width:720px;margin:0 auto}
+.hero h1{font-size:2.8rem;font-weight:800;line-height:1.2;margin-bottom:16px}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,#fff 10%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:1rem;line-height:1.65;margin-bottom:8px}
+.hero-note{font-size:.82rem;color:var(--muted);margin-top:12px;padding:10px 16px;border:1px solid var(--border);border-radius:8px;display:inline-block}
+.hero-cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+
+/* ── SECTIONS ──────────────────────── */
+.section{max-width:1120px;margin:0 auto;padding:0 24px 64px}
+.section-title{font-size:1.15rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* ── APP CARDS GRID ─────────────────── */
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
+.app-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px;transition:.2s}
+.app-card:hover{border-color:rgba(124,58,237,.5);box-shadow:0 4px 24px rgba(124,58,237,.08)}
+.app-head{display:flex;align-items:flex-start;gap:14px}
+.app-emoji{font-size:2.2rem;line-height:1;flex-shrink:0}
+.app-meta{flex:1}
+.app-name{font-size:1rem;font-weight:700;margin-bottom:5px}
+.app-cat{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(124,58,237,.13);color:var(--accent);letter-spacing:.3px}
+.app-desc{font-size:.83rem;color:var(--muted);line-height:1.6}
+.app-price{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.price-free{font-size:.78rem;background:var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;font-weight:500}
+.price-pro{font-size:.88rem;font-weight:700;color:var(--accent2)}
+.app-stores{display:flex;gap:8px;flex-wrap:wrap}
+.app-actions{display:flex;gap:8px;margin-top:2px}
+
+/* ── DASHBOARD WRAP ─────────────────── */
+.dash{max-width:1120px;margin:0 auto;padding:36px 24px 64px}
+.dash-hd{margin-bottom:28px}
+.dash-hd h2{font-size:1.7rem;font-weight:800;margin-bottom:4px}
+.dash-hd p{color:var(--muted);font-size:.9rem}
+
+/* ── STATS ROW (admin) ──────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;text-align:center}
+.stat-num{font-size:2.1rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.stat-lbl{font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── APP BARS ───────────────────────── */
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.bar-lbl{width:120px;font-size:.78rem;color:var(--muted);text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;background:var(--border);border-radius:4px;height:8px}
+.bar-fill{height:8px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .5s ease}
+.bar-val{width:28px;font-size:.78rem;text-align:right;flex-shrink:0}
+
+/* ── TABS ───────────────────────────── */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin:28px 0 20px}
+.tab{background:none;border:none;color:var(--muted);padding:10px 18px;font-size:.85rem;cursor:pointer;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── TABLE ───────────────────────────── */
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{padding:12px 14px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);background:var(--card)}
+td{padding:11px 14px;border-bottom:1px solid rgba(30,30,46,.4)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(30,30,46,.5)}
+.badge{padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700}
+.bdg-free{background:rgba(100,116,139,.15);color:var(--muted)}
+.bdg-starter{background:rgba(6,182,212,.15);color:var(--accent2)}
+.bdg-pro{background:rgba(124,58,237,.18);color:var(--accent)}
+.bdg-enterprise{background:rgba(245,158,11,.15);color:var(--yellow)}
+.filter-row{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+.filter-sel{background:var(--card);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:.82rem;cursor:pointer}
+
+/* ── USER DASH ───────────────────────── */
+.udash-grid{display:grid;grid-template-columns:340px 1fr;gap:20px}
+.dash-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
+.card-title{font-size:.9rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.profile-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(30,30,46,.5);font-size:.85rem}
+.profile-item:last-child{border-bottom:none}
+.pil{color:var(--muted)}.piv{font-weight:600}
+.plan-tag{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
+
+/* ── MINI CHAT ───────────────────────── */
+.chat-wrap{display:flex;flex-direction:column;height:240px}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;padding-right:4px}
+.chat-msgs::-webkit-scrollbar{width:4px}.chat-msgs::-webkit-scrollbar-track{background:transparent}.chat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.cmsg{max-width:85%;padding:8px 12px;border-radius:10px;font-size:.82rem;line-height:1.5}
+.cmsg-user{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+.cmsg-ai{background:var(--border);color:var(--text);align-self:flex-start;border-bottom-left-radius:3px}
+.cmsg-sys{color:var(--muted);font-size:.76rem;font-style:italic;align-self:center}
+.chat-row{display:flex;gap:8px}
+.chat-inp{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:.82rem;outline:none}
+.chat-inp:focus{border-color:var(--accent)}
+
+/* ── MODAL ───────────────────────────── */
+#modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center}
+#modal-ov.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:400px;animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.modal h2{font-size:1.35rem;font-weight:700;margin-bottom:22px}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;font-weight:600}
+.fg input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.875rem;outline:none;transition:.15s}
+.fg input:focus{border-color:var(--accent)}
+.modal-msg{font-size:.82rem;padding:8px 12px;border-radius:6px;margin-top:10px;display:none}
+.modal-msg.err{display:block;background:rgba(239,68,68,.13);color:var(--red)}
+.modal-msg.ok{display:block;background:rgba(16,185,129,.13);color:var(--green)}
+.modal-sw{text-align:center;margin-top:14px;font-size:.82rem;color:var(--muted)}
+.modal-sw a{color:var(--accent2);cursor:pointer}
+
+/* ── MISC ────────────────────────────── */
+footer{border-top:1px solid var(--border);text-align:center;padding:22px 24px;color:var(--muted);font-size:.78rem}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.green{color:var(--green)}.red{color:var(--red)}
+.text-muted{color:var(--muted)}
+.empty-state{text-align:center;padding:32px;color:var(--muted);font-size:.85rem}
+
+@media(max-width:760px){
+  .hero h1{font-size:2rem}.stats-row{grid-template-columns:repeat(2,1fr)}
+  .udash-grid{grid-template-columns:1fr}.nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────────────── -->
+<nav>
+  <div class="logo"><span style="font-size:1.4rem">⚡</span><span class="logo-text">Sianlk</span><span style="color:var(--muted);font-weight:500;font-size:.9rem">Platform</span></div>
+  <div class="nav-links" id="nav-links">
+    <button class="nav-btn active" id="nb-apps" onclick="goApps()">All Apps</button>
+    <button class="nav-btn" id="nb-dash" onclick="goDash()" style="display:none">My Dashboard</button>
+    <button class="nav-btn" id="nb-admin" onclick="goAdmin()" style="display:none">&#x1F6E1; Admin</button>
+  </div>
+  <div class="nav-right" id="nav-right">
+    <button class="btn btn-ghost btn-sm" onclick="openModal('login')">Sign In</button>
+    <button class="btn btn-primary btn-sm" onclick="openModal('register')">Get Started Free</button>
+  </div>
+</nav>
+
+<!-- ── GALLERY VIEW ──────────────────────────────────────────── -->
+<div id="view-apps">
+  <div class="hero">
+    <h1>11 Separate AI Apps.<br/><em>Individual Pricing.</em></h1>
+    <p>Each app is its own product — download individually from the App Store or Google Play.<br/>
+    One shared cloud backend keeps infrastructure lean and costs low.</p>
+    <div class="hero-note">&#x1F4F1; Apps are in development &mdash; store listings coming soon. <a href="/docs" style="margin-left:4px">API Docs &rarr;</a></div>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="openModal('register')">Create Account &mdash; It&rsquo;s Free</button>
+      <button class="btn btn-ghost" onclick="openModal('login')">Sign In</button>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">&#x1F4F1; Available Apps <span style="color:var(--muted);font-size:.8rem;font-weight:400">&mdash; each sold separately</span></div>
+    <div class="apps-grid" id="app-gallery"></div>
+  </div>
+</div>
+
+<!-- ── USER DASHBOARD VIEW ──────────────────────────────────── -->
+<div id="view-user" style="display:none">
+  <div class="dash">
+    <div class="dash-hd">
+      <h2 id="ud-title">My Dashboard</h2>
+      <p id="ud-sub">Your Sianlk account</p>
+    </div>
+    <div class="udash-grid">
+      <div class="dash-card">
+        <div class="card-title">&#x1F464; Profile</div>
+        <div id="ud-profile"></div>
+        <div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="goApps()">&#x1F4F1; Browse Apps</button>
+          <a class="btn btn-ghost btn-sm" href="/docs">API Docs</a>
+        </div>
+      </div>
+      <div class="dash-card">
+        <div class="card-title">&#x1F916; AI Assistant <span style="color:var(--green);font-size:.7rem;margin-left:4px">&#x25CF; live</span></div>
+        <div class="chat-wrap">
+          <div class="chat-msgs" id="chat-msgs"><div class="cmsg cmsg-sys">Ask me anything&hellip;</div></div>
+          <div class="chat-row">
+            <input class="chat-inp" id="chat-inp" placeholder="Type a message&hellip;" onkeydown="if(event.key==='Enter')sendChat()"/>
+            <button class="btn btn-primary btn-sm" onclick="sendChat()">&#x2192;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADMIN DASHBOARD VIEW ──────────────────────────────────── -->
+<div id="view-admin" style="display:none">
+  <div class="dash">
+    <div class="dash-hd">
+      <h2>&#x1F6E1; Admin Dashboard</h2>
+      <p id="admin-sub">Platform overview &mdash; Sianlk Unified SaaS</p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="s-users">&#x2014;</div><div class="stat-lbl">Total Users</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-active">&#x2014;</div><div class="stat-lbl">Active Users</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-ai">&#x2014;</div><div class="stat-lbl">AI Calls</div></div>
+      <div class="stat-card"><div class="stat-num">11</div><div class="stat-lbl">Apps Live</div></div>
+    </div>
+
+    <!-- Per-app bars -->
+    <div class="section-title" style="margin-bottom:14px">Users per App</div>
+    <div id="app-bars" style="margin-bottom:32px;max-width:600px"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" id="t-users" onclick="adminTab('users')">&#x1F465; Users</button>
+      <button class="tab" id="t-breakdown" onclick="adminTab('breakdown')">&#x1F4CA; App Breakdown</button>
+      <button class="tab" id="t-apps" onclick="adminTab('apps')">&#x1F4F1; All Apps</button>
+    </div>
+
+    <!-- Users tab -->
+    <div id="tab-users">
+      <div class="filter-row">
+        <select class="filter-sel" id="app-filter" onchange="loadUsers()">
+          <option value="">All Apps</option>
+          <option value="aiaesthetics">AI Aesthetics</option>
+          <option value="aiblty">AIBLTY</option>
+          <option value="aibltycode">AIBLTYCode</option>
+          <option value="buildquote">BuildQuote</option>
+          <option value="comppropdata">CompPropData</option>
+          <option value="geniai">GeniAI</option>
+          <option value="geniqx">GeniQX</option>
+          <option value="gitgit">GitGit</option>
+          <option value="sianlk">Sianlk</option>
+          <option value="terminalai">TerminalAI</option>
+          <option value="aib">AIB</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="loadUsers()">&#x21BB; Refresh</button>
+        <button class="btn btn-ghost btn-sm" onclick="goApps()">View Public Page</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Email</th><th>Name</th><th>App</th><th>Plan</th><th>Status</th><th>Joined</th></tr></thead>
+          <tbody id="users-body"><tr><td colspan="6" class="empty-state">Loading&hellip;</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Breakdown tab -->
+    <div id="tab-breakdown" style="display:none">
+      <div class="apps-grid" id="breakdown-grid" style="margin-top:8px"></div>
+    </div>
+
+    <!-- Apps tab (all apps list with prices) -->
+    <div id="tab-apps" style="display:none">
+      <div class="apps-grid" id="admin-apps-grid" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── AUTH MODAL ─────────────────────────────────────────────── -->
+<div id="modal-ov" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="m-title">Sign In</h2>
+    <div id="m-reg" style="display:none">
+      <div class="fg"><label>Full Name</label><input type="text" id="m-name" placeholder="Your name"/></div>
+    </div>
+    <div class="fg"><label>Email</label><input type="email" id="m-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')submitAuth()"/></div>
+    <div class="fg"><label>Password</label><input type="password" id="m-pass" placeholder="Min 8 characters" onkeydown="if(event.key==='Enter')submitAuth()"/></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:6px;justify-content:center" id="m-btn" onclick="submitAuth()">Sign In</button>
+    <div class="modal-msg" id="m-msg"></div>
+    <div class="modal-sw" id="m-sw">No account? <a onclick="setMode('register')">Create one free</a></div>
+  </div>
+</div>
+
+<footer>&copy; 2026 Sianlk Ltd &middot; <a href="/docs">API Docs</a> &middot; <a href="/redoc">ReDoc</a> &middot; <span class="green" style="font-size:.72rem">&#x25CF; All systems operational</span></footer>
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────
+var APPS = [
+  {slug:'aiaesthetics', name:'AI Aesthetics', icon:'&#x1F484;', cat:'Beauty & Health',
+   desc:'Personalised skin analysis, tone matching, beauty recommendations and AR try-on.',
+   price_pro:9.99, price_label:'Pro from $9.99/mo'},
+  {slug:'aiblty', name:'AIBLTY', icon:'&#x1F9E0;', cat:'Skills & Assessment',
+   desc:'Intelligent ability assessment, skill-gap analysis and personalised learning paths.',
+   price_pro:4.99, price_label:'Pro from $4.99/mo'},
+  {slug:'aibltycode', name:'AIBLTYCode', icon:'&#x1F4BB;', cat:'Developer Tools',
+   desc:'AI code assistant — generate, debug, explain and optimise code in any language.',
+   price_pro:14.99, price_label:'Pro from $14.99/mo'},
+  {slug:'buildquote', name:'BuildQuote', icon:'&#x1F3D7;', cat:'Construction',
+   desc:'Instant construction quotes with AI-predicted material costs, labour and timelines.',
+   price_pro:14.99, price_label:'Pro from $14.99/mo'},
+  {slug:'comppropdata', name:'CompPropData', icon:'&#x1F3D8;', cat:'PropTech',
+   desc:'Commercial property valuations, comparable data and AI investment scoring.',
+   price_pro:24.99, price_label:'Pro from $24.99/mo'},
+  {slug:'geniai', name:'GeniAI', icon:'&#x2728;', cat:'AI Assistant',
+   desc:'General-purpose AI with persistent memory, custom personas and multi-modal input.',
+   price_pro:9.99, price_label:'Pro from $9.99/mo'},
+  {slug:'geniqx', name:'GeniQX', icon:'&#x1F52C;', cat:'Research',
+   desc:'Quantum-enhanced AI experimentation platform for next-generation model research.',
+   price_pro:34.99, price_label:'Pro from $34.99/mo'},
+  {slug:'gitgit', name:'GitGit', icon:'&#x1F419;', cat:'DevOps',
+   desc:'AI Git workflow — smart PRs, automated code reviews, branch management and CI.',
+   price_pro:9.99, price_label:'Pro from $9.99/mo'},
+  {slug:'sianlk', name:'Sianlk', icon:'&#x1F310;', cat:'Platform Hub',
+   desc:'Unified identity, cross-app billing, dashboard and personal AI hub.',
+   price_pro:4.99, price_label:'Pro from $4.99/mo'},
+  {slug:'terminalai', name:'TerminalAI', icon:'&#x1F5A5;', cat:'Developer Tools',
+   desc:'AI-powered terminal with command suggestions, error explanations and shell automation.',
+   price_pro:7.99, price_label:'Pro from $7.99/mo'},
+  {slug:'aib', name:'AIB', icon:'&#x1F9E0;', cat:'Infrastructure',
+   desc:'Shared AI brain — embeddings, vector search, model routing and prompt orchestration.',
+   price_pro:14.99, price_label:'Pro from $14.99/mo'}
+];
+
+// ── State ─────────────────────────────────────────────────────────────
+var token = localStorage.getItem('sianlk_t');
+var user = null, isAdmin = false, adminStats = null, authMode = 'login';
+
+// ── Init ──────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  renderApps('app-gallery');
+  if (token) { fetchUser(); } else { showView('apps'); }
+});
+
+// ── API helper ────────────────────────────────────────────────────────
+function apiFetch(method, path, body) {
+  var opts = {method: method, headers: {'Content-Type': 'application/json'}};
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+  if (body) opts.body = JSON.stringify(body);
+  return fetch(path, opts).then(function(r) {
+    return r.json().then(function(d) {
+      if (!r.ok) { var e = new Error(d.detail || 'Error'); e.status = r.status; throw e; }
+      return d;
+    });
+  });
+}
+
+// ── Auth flow ─────────────────────────────────────────────────────────
+function fetchUser() {
+  apiFetch('GET', '/api/auth/me')
+    .then(function(u) {
+      user = u;
+      apiFetch('GET', '/api/admin/stats')
+        .then(function(stats) {
+          adminStats = stats; isAdmin = true;
+          updateNav(); showView('admin');
+          renderAdminStats(stats); loadUsers();
+        })
+        .catch(function() {
+          isAdmin = false; updateNav(); showView('user'); renderUserDash();
+        });
+    })
+    .catch(function() {
+      logout(); showView('apps');
+    });
+}
+
+// ── Nav ───────────────────────────────────────────────────────────────
+function updateNav() {
+  var initials = user && user.email ? user.email.charAt(0).toUpperCase() : '?';
+  document.getElementById('nav-right').innerHTML =
+    '<div class="user-pill"><div class="avatar">' + initials + '</div>' + (user ? user.email : '') + '</div>' +
+    '&nbsp;<button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>';
+  document.getElementById('nb-dash').style.display = '';
+  if (isAdmin) document.getElementById('nb-admin').style.display = '';
+}
+
+function resetNav() {
+  document.getElementById('nav-right').innerHTML =
+    '<button class="btn btn-ghost btn-sm" onclick="openModal(\'login\')">Sign In</button>' +
+    '<button class="btn btn-primary btn-sm" onclick="openModal(\'register\')">Get Started Free</button>';
+  document.getElementById('nb-dash').style.display = 'none';
+  document.getElementById('nb-admin').style.display = 'none';
+}
+
+function setActiveNav(id) {
+  ['nb-apps','nb-dash','nb-admin'].forEach(function(n){
+    var el = document.getElementById(n); if(el) el.classList.remove('active');
+  });
+  var el = document.getElementById(id); if(el) el.classList.add('active');
+}
+
+// ── Views ─────────────────────────────────────────────────────────────
+function showView(v) {
+  document.getElementById('view-apps').style.display = v==='apps' ? '' : 'none';
+  document.getElementById('view-user').style.display = v==='user' ? '' : 'none';
+  document.getElementById('view-admin').style.display = v==='admin' ? '' : 'none';
+}
+function goApps()  { showView('apps');  setActiveNav('nb-apps'); }
+function goDash()  { if(!user){openModal('login');return;} showView('user');  setActiveNav('nb-dash'); renderUserDash(); }
+function goAdmin() { if(!isAdmin){return;} showView('admin'); setActiveNav('nb-admin'); if(adminStats) renderAdminStats(adminStats); loadUsers(); }
+
+// ── App gallery render ─────────────────────────────────────────────────
+function renderApps(containerId) {
+  var html = '';
+  APPS.forEach(function(a) {
+    html +=
+      '<div class="app-card">' +
+        '<div class="app-head">' +
+          '<div class="app-emoji">' + a.icon + '</div>' +
+          '<div class="app-meta"><div class="app-name">' + a.name + '</div><span class="app-cat">' + a.cat + '</span></div>' +
+        '</div>' +
+        '<div class="app-desc">' + a.desc + '</div>' +
+        '<div class="app-price">' +
+          '<span class="price-free">Free tier included</span>' +
+          '<span class="price-pro">' + a.price_label + '</span>' +
+        '</div>' +
+        '<div class="app-stores">' +
+          '<button class="btn-store" onclick="storeTap(event)"><span>&#xF8FF;</span> App Store</button>' +
+          '<button class="btn-store" onclick="storeTap(event)"><span style=\'color:#3ddc84\'>&#x25B6;</span> Google Play</button>' +
+        '</div>' +
+        '<div class="app-actions">' +
+          '<button class="btn btn-primary btn-sm" onclick="openModal(\'register\')">Get Started Free</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="openModal(\'login\')">Sign In</button>' +
+        '</div>' +
+      '</div>';
+  });
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function storeTap(e) {
+  var btn = e.currentTarget;
+  btn.textContent = 'Coming soon!';
+  btn.style.borderColor = 'var(--accent2)';
+  btn.style.color = 'var(--accent2)';
+  setTimeout(function() {
+    btn.innerHTML = btn.innerHTML; // reset not needed since renderApps is not called again
+  }, 2000);
+}
+
+// ── User dashboard ─────────────────────────────────────────────────────
+function renderUserDash() {
+  if (!user) return;
+  var name = user.full_name || user.email.split('@')[0];
+  document.getElementById('ud-title').textContent = 'Welcome, ' + name;
+  document.getElementById('ud-sub').textContent = user.email + ' \u2014 ' + (user.plan || 'free') + ' plan';
+  document.getElementById('ud-profile').innerHTML =
+    '<div class="profile-item"><span class="pil">Email</span><span class="piv">' + user.email + '</span></div>' +
+    '<div class="profile-item"><span class="pil">Name</span><span class="piv">' + (user.full_name || '\u2014') + '</span></div>' +
+    '<div class="profile-item"><span class="pil">Plan</span><span class="piv plan-tag">' + (user.plan || 'FREE').toUpperCase() + '</span></div>' +
+    '<div class="profile-item"><span class="pil">App</span><span class="piv">' + (user.app_slug || '\u2014') + '</span></div>' +
+    '<div class="profile-item"><span class="pil">Account ID</span><span class="piv text-muted" style="font-size:.75rem">' + (user.id || '\u2014').substring(0,16) + '&hellip;</span></div>';
+}
+
+// ── Admin stats render ─────────────────────────────────────────────────
+function renderAdminStats(stats) {
+  document.getElementById('s-users').textContent  = stats.total_users  || 0;
+  document.getElementById('s-active').textContent = stats.active_users || 0;
+  document.getElementById('s-ai').textContent     = stats.total_ai_calls || 0;
+
+  var perApp = stats.users_per_app || {};
+  var vals = Object.values(perApp);
+  var maxVal = vals.length ? Math.max.apply(null, vals) : 1;
+  if (maxVal === 0) maxVal = 1;
+
+  var html = '';
+  APPS.forEach(function(a) {
+    var cnt = perApp[a.slug] || 0;
+    var pct = Math.round(cnt / maxVal * 100);
+    html +=
+      '<div class="bar-row">' +
+        '<span class="bar-lbl">' + a.name + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div>' +
+        '<span class="bar-val">' + cnt + '</span>' +
+      '</div>';
+  });
+  document.getElementById('app-bars').innerHTML = html;
+}
+
+// ── Admin users ────────────────────────────────────────────────────────
+function loadUsers() {
+  var slug = document.getElementById('app-filter') ? document.getElementById('app-filter').value : '';
+  var url = '/api/admin/users?limit=200' + (slug ? '&app_slug=' + slug : '');
+  apiFetch('GET', url).then(function(data) {
+    var rows = data.users || [];
+    if (!rows.length) {
+      document.getElementById('users-body').innerHTML = '<tr><td colspan="6" class="empty-state">No users yet.</td></tr>';
+      renderBreakdown([]);
+      return;
+    }
+    var html = '';
+    rows.forEach(function(u) {
+      var date = u.created_at ? u.created_at.substring(0,10) : '\u2014';
+      var plan = (u.plan || 'free').toLowerCase();
+      html +=
+        '<tr>' +
+          '<td>' + u.email + '</td>' +
+          '<td>' + (u.full_name || '\u2014') + '</td>' +
+          '<td>' + (u.app_slug || '\u2014') + '</td>' +
+          '<td><span class="badge bdg-' + plan + '">' + plan.toUpperCase() + '</span></td>' +
+          '<td><span class="' + (u.is_active ? 'green' : 'red') + '">' + (u.is_active ? '&#x25CF; Active' : '&#x25CB; Inactive') + '</span></td>' +
+          '<td class="text-muted">' + date + '</td>' +
+        '</tr>';
+    });
+    document.getElementById('users-body').innerHTML = html;
+    renderBreakdown(rows);
+  }).catch(function(e) {
+    document.getElementById('users-body').innerHTML = '<tr><td colspan="6" class="empty-state red">Error: ' + (e.message || 'Unknown') + '</td></tr>';
+  });
+}
+
+function renderBreakdown(rows) {
+  var counts = {};
+  APPS.forEach(function(a) { counts[a.slug] = 0; });
+  rows.forEach(function(u) { if (u.app_slug && counts[u.app_slug] !== undefined) counts[u.app_slug]++; });
+  var html = '';
+  APPS.forEach(function(a) {
+    html +=
+      '<div class="dash-card" style="display:flex;align-items:center;gap:14px">' +
+        '<div style="font-size:1.8rem">' + a.icon + '</div>' +
+        '<div style="flex:1"><div style="font-weight:700;font-size:.9rem">' + a.name + '</div><div style="color:var(--muted);font-size:.75rem">' + a.cat + '</div></div>' +
+        '<div style="text-align:right"><div style="font-size:1.4rem;font-weight:800">' + (counts[a.slug] || 0) + '</div><div style="color:var(--muted);font-size:.7rem">users</div></div>' +
+        '<div style="text-align:right;border-left:1px solid var(--border);padding-left:14px"><div style="font-weight:700;color:var(--accent2);font-size:.95rem">$' + a.price_pro.toFixed(2) + '</div><div style="color:var(--muted);font-size:.7rem">/mo pro</div></div>' +
+      '</div>';
+  });
+  var el = document.getElementById('breakdown-grid');
+  if (el) el.innerHTML = html;
+}
+
+// ── Admin tabs ─────────────────────────────────────────────────────────
+function adminTab(name) {
+  ['users','breakdown','apps'].forEach(function(n) {
+    document.getElementById('tab-'+n).style.display = n === name ? '' : 'none';
+    document.getElementById('t-'+n).classList.toggle('active', n === name);
+  });
+  if (name === 'apps') renderAdminApps();
+}
+
+function renderAdminApps() {
+  var el = document.getElementById('admin-apps-grid');
+  if (!el) return;
+  // Re-use the same app gallery but in admin context
+  renderApps('admin-apps-grid');
+}
+
+// ── Auth modal ─────────────────────────────────────────────────────────
+function openModal(m) {
+  setMode(m);
+  document.getElementById('modal-ov').classList.add('open');
+  setTimeout(function() { document.getElementById('m-email').focus(); }, 120);
+}
+function closeModal() {
+  document.getElementById('modal-ov').classList.remove('open');
+  clearMsg();
+}
+function setMode(m) {
+  authMode = m; var isReg = m === 'register';
+  document.getElementById('m-title').textContent = isReg ? 'Create Account' : 'Sign In';
+  document.getElementById('m-reg').style.display = isReg ? '' : 'none';
+  document.getElementById('m-btn').textContent   = isReg ? 'Create Account' : 'Sign In';
+  document.getElementById('m-sw').innerHTML = isReg
+    ? 'Already have an account? <a onclick="setMode(\'login\')">Sign in</a>'
+    : 'No account? <a onclick="setMode(\'register\')">Create one free</a>';
+  clearMsg();
+}
+function clearMsg() { var m = document.getElementById('m-msg'); m.className = 'modal-msg'; m.textContent = ''; }
+function showMsg(t, cls) { var m = document.getElementById('m-msg'); m.className = 'modal-msg ' + cls; m.textContent = t; }
+
+function submitAuth() {
+  var email = document.getElementById('m-email').value.trim();
+  var pass  = document.getElementById('m-pass').value;
+  var name  = authMode === 'register' ? document.getElementById('m-name').value.trim() : '';
+  if (!email || !pass) { showMsg('Please fill in all fields.', 'err'); return; }
+  if (authMode === 'register' && pass.length < 8) { showMsg('Password must be at least 8 characters.', 'err'); return; }
+  var btn = document.getElementById('m-btn');
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
+
+  var p;
+  if (authMode === 'register') {
+    p = apiFetch('POST', '/api/auth/register', {email: email, password: pass, full_name: name || email.split('@')[0]})
+        .then(function(d) { token = d.access_token; localStorage.setItem('sianlk_t', token); });
+  } else {
+    var fd = new URLSearchParams(); fd.append('username', email); fd.append('password', pass);
+    p = fetch('/api/auth/token', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: fd.toString()})
+        .then(function(r) { return r.json().then(function(d) { if(!r.ok) throw new Error(d.detail||'Login failed'); return d; }); })
+        .then(function(d) { token = d.access_token; localStorage.setItem('sianlk_t', token); });
+  }
+
+  p.then(function() {
+    closeModal(); fetchUser();
+  }).catch(function(e) {
+    showMsg(e.message || 'Authentication failed.', 'err');
+  }).finally(function() {
+    btn.textContent = authMode === 'register' ? 'Create Account' : 'Sign In';
+    btn.disabled = false;
+  });
+}
+
+function logout() {
+  localStorage.removeItem('sianlk_t');
+  token = null; user = null; isAdmin = false; adminStats = null;
+  resetNav(); showView('apps'); setActiveNav('nb-apps');
+}
+
+// ── AI Chat ────────────────────────────────────────────────────────────
+function sendChat() {
+  if (!token) { openModal('login'); return; }
+  var inp = document.getElementById('chat-inp');
+  var msg = inp.value.trim(); if (!msg) return;
+  inp.value = '';
+  addChatMsg(msg, 'user');
+  var thinking = addChatMsg('\u2026', 'ai');
+  apiFetch('POST', '/api/ai/complete', {message: msg, max_tokens: 400})
+    .then(function(d) { thinking.textContent = d.content || '(no response)'; })
+    .catch(function(e) { thinking.textContent = 'Error: ' + (e.message || 'Unknown'); thinking.style.color = 'var(--red)'; });
+}
+function addChatMsg(text, who) {
+  var el = document.createElement('div');
+  el.className = 'cmsg cmsg-' + who; el.textContent = text;
+  var box = document.getElementById('chat-msgs');
+  box.appendChild(el); box.scrollTop = box.scrollHeight; return el;
+}
+</script>
+</body>
+</html>

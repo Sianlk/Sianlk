@@ -4,7 +4,7 @@
 
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
-pydantic==2.9.2
+pydantic==2.12.5
 pydantic-settings==2.5.2
 
 # Database — async SQLite (free, no addon) OR swap DATABASE_URL for postgres

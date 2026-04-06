@@ -26,7 +26,7 @@ openai==1.51.0
 httpx==0.27.2
 
 # Payments
-stripe==10.12.0
+stripe==15.0.1
 
 # Monitoring
 sentry-sdk[fastapi]==2.14.0

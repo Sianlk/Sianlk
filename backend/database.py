@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 from backend.config import get_settings
-from backend import models  # Ensure metadata includes all tables
 
 settings = get_settings()
 
@@ -28,5 +27,6 @@ async def get_db() -> AsyncSession:
             await session.close()
 
 async def init_db():
+    from backend import models  # noqa: F401; load models before create_all
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

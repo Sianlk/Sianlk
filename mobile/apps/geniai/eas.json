@@ -1,0 +1,34 @@
+{
+  "cli": {
+    "version": ">= 7.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "channel": "preview"
+    },
+    "production": {
+      "autoIncrement": true,
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "hosturserver@gmail.com",
+        "ascAppId": "REPLACE_WITH_APP_STORE_ID"
+      },
+      "android": {
+        "serviceAccountKeyPath": "../google-service-account.json",
+        "track": "production"
+      }
+    }
+  }
+}

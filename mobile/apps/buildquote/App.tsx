@@ -254,7 +254,7 @@ function CostBar({ label, value, total, color }: { label: string; value: number;
     <View style={{ marginBottom: 12 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
         <Text style={{ color: T.dimText, fontSize: 12 }}>{label}</Text>
-        <Text style={{ color, fontSize: 12, fontWeight: '700' }}>${value.toLocaleString()}</Text>
+        <Text style={{ color, fontSize: 12, fontWeight: '700' }}>£{value.toLocaleString()}</Text>
       </View>
       <View style={{ height: 7, backgroundColor: T.border, borderRadius: 4, overflow: 'hidden' }}>
         <Animated.View style={{ height: '100%', backgroundColor: color, borderRadius: 4, width: anim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }) }} />
@@ -305,7 +305,7 @@ function EstimateTab() {
           'Contingency 10%': Math.round(total * 0.10),
         },
         ai_summary: `For a ${tier} ${projType.toLowerCase()} of ${area.toLocaleString()} sqft in ${region}, the total construction estimate is $${total.toLocaleString()}. At $${Math.round(total/sqm).toLocaleString()}/m², this reflects current ${region} market rates. Key cost drivers: MEP services (22%) and structural elements (25%). Consider value engineering in finishes to reduce by 8-12% if needed.`,
-        market_trend: 'Construction costs in this region have increased 6.2% YoY. Lock in prices early → potential saving of $' + Math.round(total * 0.06).toLocaleString(),
+        market_trend: 'Construction costs in this region have increased 6.2% YoY. Lock in prices early → potential saving of £' + Math.round(total * 0.06).toLocaleString(),
       });
     }
     setLoading(false);
@@ -376,16 +376,16 @@ function EstimateTab() {
               <LinearGradient colors={['#1A2A08', '#0F1A06']} style={{ borderRadius: 20, padding: 24, marginBottom: 14, borderWidth: 1, borderColor: T.accent + '40', alignItems: 'center' }}>
                 <Text style={{ color: T.muted, fontSize: 12, letterSpacing: 2, marginBottom: 6 }}>TOTAL ESTIMATE</Text>
                 <Text style={{ color: T.accent, fontSize: 42, fontWeight: '900', letterSpacing: -1 }}>
-                  ${(result.total_estimate / 1_000_000 >= 1 ? (result.total_estimate / 1_000_000).toFixed(2) + 'M' : Math.round(result.total_estimate / 1000) + 'k')}
+                  £{(result.total_estimate / 1_000_000 >= 1 ? (result.total_estimate / 1_000_000).toFixed(2) + 'M' : Math.round(result.total_estimate / 1000) + 'k')}
                 </Text>
                 <View style={{ flexDirection: 'row', gap: 20, marginTop: 10 }}>
                   <View style={{ alignItems: 'center' }}>
                     <Text style={{ color: T.muted, fontSize: 10 }}>per sqm</Text>
-                    <Text style={{ color: T.dimText, fontSize: 15, fontWeight: '800' }}>${result.cost_per_sqm?.toLocaleString() ?? '—'}</Text>
+                    <Text style={{ color: T.dimText, fontSize: 15, fontWeight: '800' }}>£{result.cost_per_sqm?.toLocaleString() ?? '—'}</Text>
                   </View>
                   <View style={{ alignItems: 'center' }}>
                     <Text style={{ color: T.muted, fontSize: 10 }}>per sqft</Text>
-                    <Text style={{ color: T.dimText, fontSize: 15, fontWeight: '800' }}>${result.cost_per_sqft?.toLocaleString() ?? '—'}</Text>
+                    <Text style={{ color: T.dimText, fontSize: 15, fontWeight: '800' }}>£{result.cost_per_sqft?.toLocaleString() ?? '—'}</Text>
                   </View>
                   <View style={{ alignItems: 'center' }}>
                     <Text style={{ color: T.muted, fontSize: 10 }}>region mult</Text>
@@ -469,7 +469,7 @@ function MaterialsTab() {
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: T.text, fontSize: 13, fontWeight: '700' }}>{mat.name}</Text>
-                  <Text style={{ color: T.muted, fontSize: 11 }}>${mat.rate.toLocaleString()} per {mat.unit}</Text>
+                  <Text style={{ color: T.muted, fontSize: 11 }}>£{mat.rate.toLocaleString()} per {mat.unit}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <TextInput style={{ color: T.accent, backgroundColor: 'rgba(132,204,22,0.1)', borderRadius: 8, borderWidth: 1, borderColor: T.border, paddingHorizontal: 10, paddingVertical: 6, fontSize: 13, width: 60, textAlign: 'center', fontWeight: '700' }}
@@ -489,15 +489,15 @@ function MaterialsTab() {
             <GlassCard style={{ padding: 18, marginTop: 14 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <Text style={{ color: T.muted, fontSize: 10, fontWeight: '700', letterSpacing: 1.5 }}>BILL OF MATERIALS</Text>
-                <Text style={{ color: T.accent, fontSize: 16, fontWeight: '900' }}>${total.toLocaleString()}</Text>
+                <Text style={{ color: T.accent, fontSize: 16, fontWeight: '900' }}>£{total.toLocaleString()}</Text>
               </View>
               {items.map((it, i) => (
                 <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8, borderTopWidth: 1, borderTopColor: T.border }}>
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: T.dimText, fontSize: 12 }}>{it.item.name}</Text>
-                    <Text style={{ color: T.muted, fontSize: 11 }}>{it.qty} × ${it.item.rate.toLocaleString()}</Text>
+                    <Text style={{ color: T.muted, fontSize: 11 }}>{it.qty} × £{it.item.rate.toLocaleString()}</Text>
                   </View>
-                  <Text style={{ color: T.accent, fontSize: 13, fontWeight: '700', marginRight: 12 }}>${(it.qty * it.item.rate).toLocaleString()}</Text>
+                  <Text style={{ color: T.accent, fontSize: 13, fontWeight: '700', marginRight: 12 }}>£{(it.qty * it.item.rate).toLocaleString()}</Text>
                   <TouchableOpacity onPress={() => remove(it.item.name)}>
                     <Text style={{ color: T.red, fontSize: 16 }}>✕</Text>
                   </TouchableOpacity>
@@ -584,10 +584,10 @@ function CompareTab() {
                       <Text style={{ color: tierColors[t.tier], fontWeight: '800', fontSize: 16, textTransform: 'capitalize' }}>
                         {t.tier === 'standard' ? '🏠' : t.tier === 'premium' ? '🏡' : '🏰'} {t.tier}
                       </Text>
-                      <Text style={{ color: T.muted, fontSize: 11, marginTop: 2 }}>${t.sqm.toLocaleString()}/m² · {region}</Text>
+                      <Text style={{ color: T.muted, fontSize: 11, marginTop: 2 }}>£{t.sqm.toLocaleString()}/m² · {region}</Text>
                     </View>
                     <Text style={{ color: tierColors[t.tier], fontSize: 24, fontWeight: '900' }}>
-                      ${t.total >= 1_000_000 ? (t.total / 1_000_000).toFixed(2) + 'M' : Math.round(t.total / 1000) + 'k'}
+                      £{t.total >= 1_000_000 ? (t.total / 1_000_000).toFixed(2) + 'M' : Math.round(t.total / 1000) + 'k'}
                     </Text>
                   </View>
                   <View style={{ height: 8, backgroundColor: T.border, borderRadius: 4, overflow: 'hidden' }}>
@@ -629,7 +629,7 @@ function ProjectsTab() {
             <GlassCard style={{ flex: 1, padding: 14 }}>
               <Text style={{ color: T.muted, fontSize: 10 }}>COMBINED VALUE</Text>
               <Text style={{ color: T.accent, fontSize: 22, fontWeight: '800', marginTop: 4 }}>
-                ${(SAVED_PROJECTS.reduce((s, p) => s + p.estimate, 0) / 1_000_000).toFixed(2)}M
+                £{(SAVED_PROJECTS.reduce((s, p) => s + p.estimate, 0) / 1_000_000).toFixed(2)}M
               </Text>
             </GlassCard>
           </View>
@@ -645,14 +645,14 @@ function ProjectsTab() {
                       <Text style={{ color: T.muted, fontSize: 12, marginTop: 3 }}>{p.type} · {p.region} · {p.sqft.toLocaleString()} sqft</Text>
                     </View>
                     <Text style={{ color: T.accent, fontSize: 18, fontWeight: '900' }}>
-                      ${p.estimate >= 1_000_000 ? (p.estimate / 1_000_000).toFixed(2) + 'M' : Math.round(p.estimate / 1000) + 'k'}
+                      £{p.estimate >= 1_000_000 ? (p.estimate / 1_000_000).toFixed(2) + 'M' : Math.round(p.estimate / 1000) + 'k'}
                     </Text>
                   </View>
                   {open && (
                     <View style={{ marginTop: 14, gap: 8 }}>
                       {[
                         ['Specification', p.tier.charAt(0).toUpperCase() + p.tier.slice(1)],
-                        ['Cost/sqft', '$' + Math.round(p.estimate / p.sqft).toLocaleString()],
+                        ['Cost/sqft', '£' + Math.round(p.estimate / p.sqft).toLocaleString()],
                         ['Region Premium', (((REGION_MULT[p.region] ?? 1) - 1) * 100).toFixed(0) + '% above base'],
                       ].map(([k, v], j) => (
                         <View key={j} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 8, borderTopWidth: 1, borderTopColor: T.border }}>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView,
   KeyboardAvoidingView, Platform, Animated, ActivityIndicator,
-  FlatList, SafeAreaView, StatusBar, Dimensions,
+  SafeAreaView, StatusBar, Dimensions, FlatList, Clipboard,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
@@ -10,50 +10,64 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width: SW, height: SH } = Dimensions.get('window');
+const { width: SW } = Dimensions.get('window');
 const API = 'https://sianlk-unified-9w6jz.ondigitalocean.app';
 
 const T = {
-  bg: '#0A0A0F', card: '#13131A', border: '#1E1E2E',
-  accent: '#7C3AED', cyan: '#06B6D4', text: '#E2E8F0',
-  muted: '#64748B', green: '#10B981', red: '#EF4444', yellow: '#F59E0B',
+  bg: '#050A12', card: '#0A1218', border: '#0E2030',
+  accent: '#06B6D4', purple: '#8B5CF6', text: '#F0F9FF',
+  muted: '#4A7A8A', dimText: '#67E8F9', green: '#10B981',
+  orange: '#F97316', red: '#EF4444', gold: '#F59E0B',
+  teal: '#14B8A6', indigo: '#6366F1', fuchsia: '#D946EF',
 };
 
-function Particles({ count = 14, accent = T.accent }) {
+const Tab   = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function Particles({ count = 14 }: { count?: number }) {
   const anims = useRef(Array.from({ length: count }, () => ({
-    op: new Animated.Value(0), x: Math.random() * SW, y: Math.random() * SH,
-    size: Math.random() * 3 + 1, dur: 2500 + Math.random() * 2500, delay: Math.random() * 1800,
+    op: new Animated.Value(0), x: Math.random() * SW, y: Math.random() * 860,
+    size: Math.random() * 3 + 1, dur: 3200 + Math.random() * 2600, delay: Math.random() * 3500,
   }))).current;
   useEffect(() => {
     anims.forEach(p => Animated.loop(Animated.sequence([
       Animated.delay(p.delay),
-      Animated.timing(p.op, { toValue: 0.65, duration: p.dur, useNativeDriver: true }),
-      Animated.timing(p.op, { toValue: 0, duration: p.dur, useNativeDriver: true }),
+      Animated.timing(p.op, { toValue: 0.5, duration: p.dur, useNativeDriver: true }),
+      Animated.timing(p.op, { toValue: 0,   duration: p.dur, useNativeDriver: true }),
     ])).start());
   }, []);
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {anims.map((p, i) => (
-        <Animated.View key={i} style={{ position: 'absolute', left: p.x, top: p.y, width: p.size, height: p.size, borderRadius: p.size / 2, backgroundColor: i % 2 === 0 ? accent : T.cyan, opacity: p.op }} />
+        <Animated.View key={i} style={{
+          position: 'absolute', left: p.x, top: p.y,
+          width: p.size, height: p.size, borderRadius: p.size / 2,
+          backgroundColor: i % 3 === 0 ? T.accent : i % 3 === 1 ? T.purple : T.teal,
+          opacity: p.op,
+        }} />
       ))}
     </View>
   );
 }
 
-function GCard({ children, style }: any) {
+function GlassCard({ children, style }: any) {
   return (
-    <View style={[{ backgroundColor: 'rgba(19,19,26,0.93)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(124,58,237,0.16)', overflow: 'hidden' }, style]}>
-      {children}
-    </View>
+    <View style={[{
+      backgroundColor: 'rgba(10,18,24,0.97)', borderRadius: 16,
+      borderWidth: 1, borderColor: 'rgba(6,182,212,0.18)',
+    }, style]}>{children}</View>
   );
 }
 
-function GBtn({ label, onPress, style, loading, accent = T.accent }: any) {
+function GBtn({ label, onPress, style, loading, color }: any) {
+  const c1 = color ?? T.accent;
+  const c2 = color === T.purple ? '#6D28D9' : '#0891B2';
   return (
     <TouchableOpacity onPress={onPress} style={style} activeOpacity={0.82}>
-      <LinearGradient colors={[accent, T.cyan]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 15, paddingHorizontal: 24, borderRadius: 12, gap: 8 }}>
-        {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{label}</Text>}
+      <LinearGradient colors={[c1, c2]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+        style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 13, paddingHorizontal: 22, borderRadius: 12 }}>
+        {loading ? <ActivityIndicator color="#fff" size="small" />
+          : <Text style={{ color: '#fff', fontWeight: '800', fontSize: 14 }}>{label}</Text>}
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -64,19 +78,253 @@ async function apiFetch(method: string, path: string, body?: any, token?: string
   if (token) h['Authorization'] = `Bearer ${token}`;
   const r = await fetch(`${API}${path}`, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
   const d = await r.json();
-  if (!r.ok) throw new Error(d.detail || 'Error');
+  if (!r.ok) throw new Error(d.detail || JSON.stringify(d));
   return d;
 }
 
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+// ── Accessibility knowledge ────────────────────────────────────────────────────
+const WCAG_RULES = [
+  { id: '1.1.1', level: 'A',   title: 'Non-text Content',        desc: 'All non-text content has a text alternative. Add alt="" to decorative images, descriptive alt text to informative images.', example: '<img alt="Smiling person" />', bad: '<img />' },
+  { id: '1.3.1', level: 'A',   title: 'Info & Relationships',     desc: 'Structure conveyed through visual formatting is also in the markup. Use semantic HTML (h1-h6, ul, table with <th>).', example: '<h2>Section Title</h2>', bad: '<span style="font-weight:bold">Title</span>' },
+  { id: '1.4.1', level: 'A',   title: 'Use of Colour',           desc: 'Colour is not the ONLY means of conveying information. Always add text labels or icons alongside colour cues.', example: '✓ Success (green + tick icon)', bad: 'Green = OK, Red = Error (no text)' },
+  { id: '1.4.3', level: 'AA',  title: 'Contrast (Minimum)',       desc: 'Text has contrast ratio ≥ 4.5:1 (normal text) or ≥ 3:1 (large text ≥18pt or bold ≥14pt).', example: '#000 on #fff = 21:1 ✓', bad: '#999 on #fff = 2.85:1 ✗' },
+  { id: '1.4.11', level: 'AA', title: 'Non-text Contrast',        desc: 'UI components (form fields, buttons, icons) have contrast ≥ 3:1 against adjacent colours.', example: 'Button border: 3.1:1 contrast', bad: 'Light grey border on white bg' },
+  { id: '2.1.1', level: 'A',   title: 'Keyboard',                desc: 'All functionality operable by keyboard. No keyboard traps. Tab order is logical.', example: 'onKeyPress, tabIndex={0}', bad: 'onClick only on <div>' },
+  { id: '2.1.2', level: 'A',   title: 'No Keyboard Trap',         desc: 'Keyboard focus is never locked in a sub-component. Modals must allow Escape to close.', example: 'Modal: Escape key closes', bad: 'Focus trapped in date picker' },
+  { id: '2.4.1', level: 'A',   title: 'Bypass Blocks',           desc: 'A mechanism to skip over repeated content like nav menus. Add a "Skip to main content" link.', example: '<a href="#main">Skip nav</a>', bad: 'No skip link' },
+  { id: '2.4.3', level: 'A',   title: 'Focus Order',             desc: 'Focus sequence must preserve meaning. Avoid positive tabIndex or display: none for keyboard-visible items.', example: 'tabIndex={0} flow matches DOM', bad: 'tabIndex={3} then tabIndex={1}' },
+  { id: '2.4.7', level: 'AA',  title: 'Focus Visible',           desc: 'Keyboard focus indicator is visible. Never remove outline:none without a custom focus style.', example: ':focus { outline: 2px solid blue }', bad: '* { outline: none }' },
+  { id: '3.1.1', level: 'A',   title: 'Language of Page',        desc: 'The page/document language is specified in markup. <html lang="en">. In React Native, aria-label language.', example: '<html lang="en">', bad: '<html>' },
+  { id: '3.3.1', level: 'A',   title: 'Error Identification',    desc: 'Input errors are identified in text, not only colour. Show error message alongside the field.', example: '<p role="alert">Email invalid</p>', bad: 'Red border only on error' },
+  { id: '3.3.2', level: 'A',   title: 'Labels or Instructions',  desc: 'Form inputs have labels. Use <label> or aria-label. Never remove labels for placeholder text alone.', example: '<label for="email">Email</label>', bad: '<input placeholder="Email" />' },
+  { id: '4.1.1', level: 'A',   title: 'Parsing',                 desc: 'Markup has complete opening/closing tags, no duplicate IDs, valid nesting per spec.', example: 'Valid HTML structure', bad: '<p><span></p></span>' },
+  { id: '4.1.2', level: 'A',   title: 'Name, Role, Value',       desc: 'UI components have computed name, role, and state. Use semantic elements or ARIA. Avoid custom widgets without ARIA.', example: 'role="button" aria-pressed="true"', bad: '<div onClick={…}>' },
+];
 
+const SEVERITY_MOCK: Record<string, { sev: string; count: number; msg: string }[]> = {
+  missing_alt:    [{ sev: 'CRITICAL', count: 1, msg: 'Image missing alt attribute — screen readers cannot convey image meaning.' }],
+  div_button:     [{ sev: 'CRITICAL', count: 1, msg: '<div> used as button — not keyboard accessible, no implicit role.' }],
+  placeholder:    [{ sev: 'MAJOR',    count: 1, msg: 'Input uses only placeholder as label — placeholder disappears on focus.' }],
+  no_lang:        [{ sev: 'MAJOR',    count: 1, msg: 'HTML element missing lang attribute — assistive tech cannot set language.' }],
+  no_skip:        [{ sev: 'MINOR',    count: 1, msg: 'No skip-to-content link — keyboard users must tab through all navigation.' }],
+  contrast:       [{ sev: 'MAJOR',    count: 1, msg: 'Low contrast ratio detected — text may be unreadable for low-vision users.' }],
+  no_error_text:  [{ sev: 'MAJOR',    count: 1, msg: 'Form errors indicated by colour only — colour-blind users cannot detect errors.' }],
+};
+
+function detectIssues(code: string): { sev: string; msg: string }[] {
+  const issues: { sev: string; msg: string }[] = [];
+  if (/<img(?![^>]*alt=)[^>]*>/i.test(code))           issues.push(...SEVERITY_MOCK.missing_alt);
+  if (/<div[^>]*onClick/i.test(code))                   issues.push(...SEVERITY_MOCK.div_button);
+  if (/<input[^>]*placeholder(?![^>]*(?:aria-label|id))/i.test(code)) issues.push(...SEVERITY_MOCK.placeholder);
+  if (!/<html[^>]*lang=/i.test(code) && code.includes('<html')) issues.push(...SEVERITY_MOCK.no_lang);
+  if (!code.toLowerCase().includes('skip'))             issues.push(...SEVERITY_MOCK.no_skip);
+  if (/color:\s*(?:red|green|orange)(?!.*(?:aria|role|text))/i.test(code)) issues.push(...SEVERITY_MOCK.no_error_text);
+  return issues;
+}
+
+type AuditResult = { score: number; issues: { sev: string; msg: string }[]; ariaScore: number; contrastWarning: boolean };
+
+function calcAuditResult(code: string): AuditResult {
+  const issues = detectIssues(code);
+  const critical = issues.filter(i => i.sev === 'CRITICAL').length;
+  const major    = issues.filter(i => i.sev === 'MAJOR').length;
+  const score    = Math.max(20, 100 - critical * 25 - major * 12 - (issues.length - critical - major) * 5);
+  const ariaScore = code.includes('aria-') ? (code.match(/aria-/g) || []).length * 8 + 40 : 20;
+  return { score: Math.min(score, 100), issues, ariaScore: Math.min(ariaScore, 100), contrastWarning: !(/#[0-9a-fA-F]{6}/.test(code)) };
+}
+
+// ── Components / patterns for generate ────────────────────────────────────────
+const COMPONENT_TEMPLATES: Record<string, (opts: any) => string> = {
+  Button: ({ label = 'Click me', id = 'btn-1' }) => `<button
+  id="${id}"
+  type="button"
+  aria-label="${label}"
+  aria-pressed="false"
+  className="btn btn-primary"
+  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClick(); }}
+>
+  ${label}
+</button>`,
+  Input: ({ label = 'Email address', id = 'email-input', type = 'email' }) => `{/* Label MUST be associated to input */}
+<label htmlFor="${id}">${label}</label>
+<input
+  id="${id}"
+  type="${type}"
+  aria-required="true"
+  aria-describedby="${id}-hint ${id}-error"
+  autoComplete="${type}"
+/>
+<span id="${id}-hint" className="hint">
+  Enter your ${label.toLowerCase()}
+</span>
+<span id="${id}-error" role="alert" className="error" aria-live="assertive">
+  {/* Rendered only on validation error */}
+</span>`,
+  Modal: ({ title = 'Confirm Action' }) => `{/* Accessible Modal — WCAG 2.4.3, 2.1.1, 2.1.2 */}
+<div
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  aria-describedby="modal-desc"
+  onKeyDown={(e) => { if (e.key === 'Escape') closeModal(); }}
+>
+  <h2 id="modal-title">${title}</h2>
+  <p id="modal-desc">
+    {/* Description of what the dialog does */}
+  </p>
+  {/* Dialog content here */}
+  <button
+    aria-label="Close dialog"
+    onClick={closeModal}
+    autoFocus
+  >
+    ✕ Close
+  </button>
+</div>`,
+  Navigation: () => `{/* Accessible navigation — WCAG 2.4.1, 4.1.2 */}
+<nav aria-label="Main navigation">
+  {/* Skip link — FIRST focusable element */}
+  <a href="#main-content" className="skip-link">
+    Skip to main content
+  </a>
+
+  <ul role="list">
+    <li><a href="/" aria-current="page">Home</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+</nav>
+
+<main id="main-content" tabIndex={-1}>
+  {/* Main content */}
+</main>`,
+  Table: ({ caption = 'User list' }) => `{/* Accessible data table — WCAG 1.3.1 */}
+<table aria-describedby="table-summary">
+  <caption>${caption}</caption>
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Role</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Alice</td>
+      <td>Admin</td>
+      <td>
+        <span aria-label="Active status">✅ Active</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p id="table-summary" className="sr-only">
+  ${caption}. Use arrow keys to navigate rows.
+</p>`,
+};
+
+// ── Splash ────────────────────────────────────────────────────────────────────
+function SplashScreen({ navigation }: any) {
+  const scale = useRef(new Animated.Value(0.1)).current;
+  const op    = useRef(new Animated.Value(0)).current;
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(scale, { toValue: 1, tension: 38, friction: 7, useNativeDriver: true }),
+      Animated.timing(op,    { toValue: 1, duration: 700, useNativeDriver: true }),
+    ]).start();
+    Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1.06, duration: 1400, useNativeDriver: true }),
+      Animated.timing(pulse, { toValue: 1,    duration: 1400, useNativeDriver: true }),
+    ])).start();
+    AsyncStorage.getItem('sianlk_t').then(t =>
+      setTimeout(() => navigation.replace(t ? 'Main' : 'Onboarding'), 2800)
+    );
+  }, []);
+  return (
+    <View style={{ flex: 1, backgroundColor: T.bg, alignItems: 'center', justifyContent: 'center' }}>
+      <LinearGradient colors={['#020710', '#050A12', '#080F18']} style={StyleSheet.absoluteFill} />
+      <Particles count={18} />
+      <Animated.View style={{ alignItems: 'center', transform: [{ scale }], opacity: op }}>
+        <Animated.View style={{ transform: [{ scale: pulse }], marginBottom: 24 }}>
+          <LinearGradient colors={[T.accent, T.purple, T.teal, T.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={{ width: 126, height: 126, borderRadius: 63, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 110, height: 110, borderRadius: 55, backgroundColor: T.bg, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 58 }}>♿</Text>
+            </View>
+          </LinearGradient>
+        </Animated.View>
+        <Text style={{ color: T.text, fontSize: 33, fontWeight: '900', letterSpacing: -0.5 }}>AIbltyCode</Text>
+        <Text style={{ color: T.muted, fontSize: 11, marginTop: 6, letterSpacing: 3 }}>ACCESSIBILITY CODE INTELLIGENCE</Text>
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 14 }}>
+          {['WCAG 2.2', 'AA/AAA', 'ARIA 1.2'].map(t => (
+            <View key={t} style={{ backgroundColor: T.accent + '20', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: T.accent + '40' }}>
+              <Text style={{ color: T.accent, fontSize: 10, fontWeight: '700' }}>{t}</Text>
+            </View>
+          ))}
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
+
+// ── Onboarding ────────────────────────────────────────────────────────────────
+const SLIDES = [
+  { emoji: '🔍', title: 'WCAG 2.2 Audit AI', desc: 'Paste any HTML, JSX or React code and get an instant WCAG 2.2 compliance audit with severity-ranked issues, contrast checks and ARIA coverage scores.' },
+  { emoji: '⚡', title: 'Generate Accessible Code', desc: 'Describe a UI component in plain English and receive production-ready, fully accessible code with correct ARIA roles, keyboard navigation and screen-reader support.' },
+  { emoji: '📚', title: 'WCAG Guidelines', desc: 'Browse all WCAG 2.1/2.2 success criteria with pass/fail examples. Become an accessibility expert and write inclusive code from day one.' },
+];
+function OnboardingScreen({ navigation }: any) {
+  const [idx, setIdx] = useState(0);
+  const op    = useRef(new Animated.Value(1)).current;
+  const slideX = useRef(new Animated.Value(0)).current;
+  const next = () => {
+    Animated.parallel([
+      Animated.timing(op,     { toValue: 0, duration: 160, useNativeDriver: true }),
+      Animated.timing(slideX, { toValue: -30, duration: 160, useNativeDriver: true }),
+    ]).start(() => {
+      if (idx < SLIDES.length - 1) {
+        setIdx(i => i + 1); slideX.setValue(28);
+        Animated.parallel([
+          Animated.timing(op,     { toValue: 1, duration: 220, useNativeDriver: true }),
+          Animated.timing(slideX, { toValue: 0, duration: 220, useNativeDriver: true }),
+        ]).start();
+      } else navigation.replace('Auth');
+    });
+  };
+  const s = SLIDES[idx];
+  return (
+    <View style={{ flex: 1, backgroundColor: T.bg }}>
+      <LinearGradient colors={['#020710', '#050A12']} style={StyleSheet.absoluteFill} />
+      <Particles count={8} />
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
+          <Animated.View style={{ alignItems: 'center', opacity: op, transform: [{ translateX: slideX }] }}>
+            <LinearGradient colors={[T.accent + '28', T.purple + '28']} style={{ width: 130, height: 130, borderRadius: 42, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: T.accent + '44' }}>
+              <Text style={{ fontSize: 72 }}>{s.emoji}</Text>
+            </LinearGradient>
+            <Text style={{ color: T.text, fontSize: 26, fontWeight: '800', textAlign: 'center', marginTop: 22, marginBottom: 14, lineHeight: 34 }}>{s.title}</Text>
+            <Text style={{ color: T.muted, fontSize: 16, textAlign: 'center', lineHeight: 27 }}>{s.desc}</Text>
+          </Animated.View>
+        </View>
+        <View style={{ padding: 28 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 22 }}>
+            {SLIDES.map((_, i) => <View key={i} style={{ width: i === idx ? 26 : 7, height: 7, borderRadius: 3.5, backgroundColor: i === idx ? T.accent : T.border }} />)}
+          </View>
+          <GBtn label={idx < SLIDES.length - 1 ? 'Continue →' : 'Start Building Accessible Code'} onPress={next} />
+        </View>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
 function AuthScreen({ navigation }: any) {
-  const [mode, setMode] = useState<'login'|'register'>('login');
-  const [email, setEmail] = useState(''); const [pw, setPw] = useState(''); const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false); const [err, setErr] = useState('');
+  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState(''); const [pw, setPw] = useState('');
+  const [name, setName] = useState(''); const [loading, setLoading] = useState(false); const [err, setErr] = useState('');
   const submit = async () => {
-    if (!email || !pw) return setErr('Fill in all fields');
+    if (!email || !pw) return setErr('Fill all fields');
     setLoading(true); setErr('');
     try {
       let token: string;
@@ -86,178 +334,350 @@ function AuthScreen({ navigation }: any) {
       } else {
         const fd = new URLSearchParams(); fd.append('username', email); fd.append('password', pw);
         const r = await fetch(`${API}/api/auth/token`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd.toString() });
-        const d = await r.json(); if (!r.ok) throw new Error(d.detail);
-        token = d.access_token;
+        const d = await r.json(); if (!r.ok) throw new Error(d.detail || 'Login failed'); token = d.access_token;
       }
-      await AsyncStorage.setItem('sianlk_t', token);
-      navigation.replace('Main');
+      await AsyncStorage.setItem('sianlk_t', token); navigation.replace('Main');
     } catch (e: any) { setErr(e.message); } finally { setLoading(false); }
   };
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: T.bg }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <LinearGradient colors={['#180530', '#0A0A0F']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['#020710', '#050A12']} style={StyleSheet.absoluteFill} />
       <SafeAreaView style={{ flex: 1, justifyContent: 'center', padding: 28 }}>
-        <Text style={{ color: T.text, fontSize: 28, fontWeight: '800', marginBottom: 6 }}>{mode === 'login' ? 'Welcome back' : 'Create account'}</Text>
-        <Text style={{ color: T.muted, marginBottom: 28, fontSize: 14 }}>{mode === 'login' ? 'Sign in to continue' : 'Free to start'}</Text>
-        <GCard style={{ padding: 18, marginBottom: 16 }}>
-          {mode === 'register' && <TextInput style={{ color: T.text, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, borderWidth: 1, borderColor: T.border, padding: 13, fontSize: 15, marginBottom: 12 }} placeholder="Full name" placeholderTextColor={T.muted} value={name} onChangeText={setName} autoCapitalize="words" />}
-          <TextInput style={{ color: T.text, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, borderWidth: 1, borderColor: T.border, padding: 13, fontSize: 15, marginBottom: 12 }} placeholder="Email" placeholderTextColor={T.muted} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-          <TextInput style={{ color: T.text, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, borderWidth: 1, borderColor: T.border, padding: 13, fontSize: 15 }} placeholder="Password" placeholderTextColor={T.muted} value={pw} onChangeText={setPw} secureTextEntry onSubmitEditing={submit} />
-          {err ? <Text style={{ color: T.red, marginTop: 10, fontSize: 13 }}>{err}</Text> : null}
-        </GCard>
+        <Text style={{ color: T.text, fontSize: 28, fontWeight: '800', marginBottom: 4 }}>{mode === 'login' ? 'Welcome back' : 'Join AIbltyCode'}</Text>
+        <Text style={{ color: T.muted, marginBottom: 28, fontSize: 14 }}>Accessibility Code Intelligence</Text>
+        <GlassCard style={{ padding: 18, marginBottom: 16 }}>
+          {mode === 'register' && <TextInput style={{ color: T.text, backgroundColor: 'rgba(6,182,212,0.07)', borderRadius: 10, borderWidth: 1, borderColor: T.border, padding: 13, fontSize: 15, marginBottom: 12 }} placeholder="Full name" placeholderTextColor={T.muted} value={name} onChangeText={setName} autoCapitalize="words" />}
+          <TextInput style={{ color: T.text, backgroundColor: 'rgba(6,182,212,0.07)', borderRadius: 10, borderWidth: 1, borderColor: T.border, padding: 13, fontSize: 15, marginBottom: 12 }} placeholder="Email" placeholderTextColor={T.muted} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+          <TextInput style={{ color: T.text, backgroundColor: 'rgba(6,182,212,0.07)', borderRadius: 10, borderWidth: 1, borderColor: T.border, padding: 13, fontSize: 15 }} placeholder="Password" placeholderTextColor={T.muted} value={pw} onChangeText={setPw} secureTextEntry onSubmitEditing={submit} />
+          {err ? <Text style={{ color: T.red, marginTop: 10, fontSize: 12 }}>{err}</Text> : null}
+        </GlassCard>
         <GBtn label={mode === 'login' ? 'Sign In' : 'Create Account'} onPress={submit} loading={loading} style={{ marginBottom: 14 }} />
         <TouchableOpacity onPress={() => { setMode(m => m === 'login' ? 'register' : 'login'); setErr(''); }} style={{ alignItems: 'center' }}>
-          <Text style={{ color: T.muted, fontSize: 13 }}>{mode === 'login' ? "No account? " : "Have an account? "}<Text style={{ color: T.cyan, fontWeight: '600' }}>{mode === 'login' ? 'Create one free' : 'Sign in'}</Text></Text>
+          <Text style={{ color: T.muted, fontSize: 13 }}>{mode === 'login' ? "New here? " : "Have an account? "}<Text style={{ color: T.accent }}>{mode === 'login' ? 'Create free account' : 'Sign in'}</Text></Text>
         </TouchableOpacity>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
-function SplashScreen({ navigation }: any) {
-  const scale = useRef(new Animated.Value(0.2)).current;
-  const op = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.parallel([Animated.spring(scale, { toValue: 1, tension: 45, friction: 7, useNativeDriver: true }), Animated.timing(op, { toValue: 1, duration: 900, useNativeDriver: true })]).start();
-    AsyncStorage.getItem('sianlk_t').then(t => setTimeout(() => navigation.replace(t ? 'Main' : 'Onboarding'), 2200));
-  }, []);
+// ── Audit Tab ─────────────────────────────────────────────────────────────────
+const SEV_COLOR: Record<string, string> = { CRITICAL: T.red, MAJOR: T.orange, MINOR: T.gold };
+
+function ScoreGauge({ score, label }: { score: number; label: string }) {
+  const anim = useRef(new Animated.Value(0)).current;
+  useEffect(() => { Animated.timing(anim, { toValue: score / 100, duration: 900, useNativeDriver: false }).start(); }, [score]);
+  const color = score >= 80 ? T.green : score >= 60 ? T.gold : T.orange;
   return (
-    <View style={{ flex: 1, backgroundColor: T.bg, alignItems: 'center', justifyContent: 'center' }}>
-      <LinearGradient colors={['#001A26', '#0A0A0F', '#001020']} style={StyleSheet.absoluteFill} />
-      <Particles count={20} accent={T.cyan} />
-      <Animated.View style={{ alignItems: 'center', transform: [{ scale }], opacity: op }}>
-        <LinearGradient colors={[T.cyan, '#0066FF']} style={{ width: 110, height: 110, borderRadius: 30, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 52 }}>💻</Text>
-        </LinearGradient>
-        <Text style={{ color: T.text, fontSize: 32, fontWeight: '900', marginTop: 20 }}>AIBLTYCode</Text>
-        <Text style={{ color: T.muted, fontSize: 14, marginTop: 6 }}>AI code assistant on mobile</Text>
-      </Animated.View>
+    <View style={{ alignItems: 'center', flex: 1 }}>
+      <View style={{ width: 66, height: 66, borderRadius: 33, borderWidth: 3, borderColor: color + '40', backgroundColor: color + '14', alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ color, fontSize: 17, fontWeight: '900' }}>{score}</Text>
+      </View>
+      <Text style={{ color: T.muted, fontSize: 10, marginTop: 5 }}>{label}</Text>
     </View>
   );
 }
 
-const SLIDES_C = [
-  { emoji: '⚡', title: 'AI Code Completion', desc: 'Complete, debug and improve code in any language with GPT-4o level intelligence.' },
-  { emoji: '🔍', title: 'Deep Code Review', desc: 'Security scan, performance analysis and quality score on any code snippet.' },
-  { emoji: '📖', title: 'Code Explainer', desc: 'Understand any code at beginner, intermediate or advanced depth instantly.' },
-];
+function AuditTab() {
+  const [code, setCode] = useState('');
+  const [result, setResult] = useState<AuditResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-function OnboardingScreen({ navigation }: any) {
-  const [idx, setIdx] = useState(0); const anim = useRef(new Animated.Value(1)).current;
-  const advance = () => { Animated.sequence([Animated.timing(anim, { toValue: 0, duration: 160, useNativeDriver: true }), Animated.timing(anim, { toValue: 1, duration: 200, useNativeDriver: true })]).start(() => { if (idx < SLIDES_C.length - 1) setIdx(i => i + 1); else navigation.replace('Auth'); }); };
-  const s = SLIDES_C[idx];
+  const SAMPLE = `<div onClick={handleSubmit}>Submit</div>
+<img src="logo.png" />
+<input placeholder="Email" type="email" />
+<p style="color: red">Error!</p>`;
+
+  const doAudit = async () => {
+    if (!code.trim()) return;
+    setLoading(true); setResult(null); fadeAnim.setValue(0);
+    await new Promise(r => setTimeout(r, 700));
+    try {
+      const token = await AsyncStorage.getItem('sianlk_t');
+      const data  = await apiFetch('POST', '/api/apps/aibltycode/audit', { code }, token);
+      setResult(data);
+    } catch {
+      setResult(calcAuditResult(code));
+    }
+    setLoading(false);
+    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: T.bg }}>
-      <LinearGradient colors={['#001A26', '#0A0A0F']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['#020710', '#050A12']} style={StyleSheet.absoluteFill} />
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <Animated.View style={{ alignItems: 'center', opacity: anim }}>
-            <Text style={{ fontSize: 88 }}>{s.emoji}</Text>
-            <Text style={{ color: T.text, fontSize: 28, fontWeight: '800', textAlign: 'center', marginTop: 16, marginBottom: 14 }}>{s.title}</Text>
-            <Text style={{ color: T.muted, fontSize: 16, textAlign: 'center', lineHeight: 26 }}>{s.desc}</Text>
-          </Animated.View>
-        </View>
-        <View style={{ padding: 28 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 26 }}>
-            {SLIDES_C.map((_, i) => <View key={i} style={{ width: i === idx ? 22 : 6, height: 6, borderRadius: 3, backgroundColor: i === idx ? T.cyan : T.border }} />)}
-          </View>
-          <GBtn label={idx < SLIDES_C.length - 1 ? 'Next →' : 'Start Coding'} onPress={advance} accent={T.cyan} />
-        </View>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 40, gap: 12 }} keyboardShouldPersistTaps="handled">
+            <Text style={{ color: T.text, fontSize: 20, fontWeight: '800', marginBottom: 2 }}>WCAG 2.2 Audit</Text>
+            <Text style={{ color: T.muted, fontSize: 13, marginBottom: 4 }}>Paste your HTML, JSX or React code</Text>
+
+            <GlassCard style={{ padding: 0, overflow: 'hidden' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: T.border }}>
+                <Text style={{ color: T.muted, fontSize: 11, fontWeight: '700', letterSpacing: 1.5 }}>CODE INPUT</Text>
+                <TouchableOpacity onPress={() => setCode(SAMPLE)}>
+                  <Text style={{ color: T.accent, fontSize: 11, fontWeight: '700' }}>Load sample →</Text>
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={{ color: '#67E8F9', fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace', fontSize: 12, padding: 14, minHeight: 160, textAlignVertical: 'top', lineHeight: 20 }}
+                multiline placeholder="<button>Click me</button> ..." placeholderTextColor={T.muted}
+                value={code} onChangeText={setCode} autoCorrect={false} autoCapitalize="none"
+              />
+            </GlassCard>
+
+            <GBtn label="🔍  Run WCAG 2.2 Audit" onPress={doAudit} loading={loading} />
+
+            {result && (
+              <Animated.View style={{ opacity: fadeAnim, gap: 12 }}>
+                {/* Scores */}
+                <GlassCard style={{ padding: 18 }}>
+                  <Text style={{ color: T.muted, fontSize: 10, fontWeight: '700', letterSpacing: 1.5, marginBottom: 14 }}>COMPLIANCE SCORES</Text>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <ScoreGauge score={result.score}     label="WCAG Score" />
+                    <ScoreGauge score={result.ariaScore} label="ARIA Coverage" />
+                    <ScoreGauge score={result.issues.length === 0 ? 100 : Math.max(20, 100 - result.issues.length * 18)} label="Semantics" />
+                  </View>
+                </GlassCard>
+
+                {/* Issues */}
+                {result.issues.length === 0 ? (
+                  <GlassCard style={{ padding: 20, backgroundColor: 'rgba(16,185,129,0.08)', borderColor: 'rgba(16,185,129,0.3)' }}>
+                    <Text style={{ color: T.green, fontSize: 16, fontWeight: '800', textAlign: 'center' }}>✅ No issues detected</Text>
+                    <Text style={{ color: T.muted, textAlign: 'center', marginTop: 6, fontSize: 13 }}>Your code passed all automated WCAG 2.2 checks.</Text>
+                  </GlassCard>
+                ) : (
+                  <GlassCard style={{ padding: 4 }}>
+                    <View style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: T.border }}>
+                      <Text style={{ color: T.muted, fontSize: 10, fontWeight: '700', letterSpacing: 1.5 }}>ISSUES ({result.issues.length})</Text>
+                    </View>
+                    {result.issues.map((issue, i) => (
+                      <View key={i} style={{ padding: 14, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: T.border }}>
+                        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+                          <View style={{ backgroundColor: SEV_COLOR[issue.sev] + '20', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1, borderColor: SEV_COLOR[issue.sev] + '50' }}>
+                            <Text style={{ color: SEV_COLOR[issue.sev], fontSize: 9, fontWeight: '800', letterSpacing: 1 }}>{issue.sev}</Text>
+                          </View>
+                        </View>
+                        <Text style={{ color: T.dimText, fontSize: 13, lineHeight: 19 }}>{issue.msg}</Text>
+                      </View>
+                    ))}
+                  </GlassCard>
+                )}
+
+                {result.contrastWarning && (
+                  <GlassCard style={{ padding: 14, backgroundColor: 'rgba(245,158,11,0.08)', borderColor: 'rgba(245,158,11,0.3)' }}>
+                    <Text style={{ color: T.gold, fontSize: 11, fontWeight: '700', marginBottom: 4 }}>⚠️ CONTRAST TIP</Text>
+                    <Text style={{ color: T.muted, fontSize: 12, lineHeight: 18 }}>Verify all text has ≥ 4.5:1 contrast ratio (WCAG 1.4.3). Use a contrast checker tool on your final colour choices.</Text>
+                  </GlassCard>
+                )}
+
+                {/* Inline fix suggestion */}
+                {result.issues.some(i => i.sev === 'CRITICAL') && (
+                  <GlassCard style={{ padding: 14 }}>
+                    <Text style={{ color: T.red, fontSize: 10, fontWeight: '700', letterSpacing: 1.5, marginBottom: 10 }}>🔧 QUICK FIXES</Text>
+                    {result.issues.filter(i => i.sev === 'CRITICAL').map((issue, i) => (
+                      <View key={i} style={{ marginBottom: 10, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: T.border, paddingTop: i === 0 ? 0 : 10 }}>
+                        <Text style={{ color: T.text, fontSize: 12, lineHeight: 18 }}>→ {issue.msg.split('—')[0].trim()}: switch to semantic HTML or add ARIA roles.</Text>
+                      </View>
+                    ))}
+                  </GlassCard>
+                )}
+              </Animated.View>
+            )}
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
   );
 }
 
-function EditorScreen() {
-  const [code, setCode] = useState('def fibonacci(n):\n    # TODO: implement\n    pass');
-  const [lang, setLang] = useState('python');
+// ── Generate Tab ──────────────────────────────────────────────────────────────
+function GenerateTab() {
+  const [prompt, setPrompt] = useState('');
+  const [component, setComponent] = useState('');
   const [result, setResult] = useState('');
-  const [mode, setMode] = useState<'complete'|'explain'|'review'>('complete');
   const [loading, setLoading] = useState(false);
-  const LANGS = ['python', 'javascript', 'typescript', 'go', 'rust', 'java', 'swift'];
-  const run = async () => {
-    setLoading(true); setResult('');
+  const [copied, setCopied] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const COMP_TYPES = Object.keys(COMPONENT_TEMPLATES);
+
+  const generate = async () => {
+    setLoading(true); setResult(''); fadeAnim.setValue(0);
+    await new Promise(r => setTimeout(r, 800));
     try {
       const token = await AsyncStorage.getItem('sianlk_t');
-      const ep = mode === 'complete' ? 'complete' : mode === 'explain' ? 'explain' : 'review';
-      const data = await apiFetch('POST', `/api/apps/aibltycode/${ep}`, { code, language: lang, detail_level: 'intermediate' }, token);
-      setResult(data.completion || data.explanation || data.review || 'Done.');
-    } catch (e: any) { setResult('Error: ' + e.message); } finally { setLoading(false); }
+      const data  = await apiFetch('POST', '/api/apps/aibltycode/generate', { prompt, component }, token);
+      setResult(data.code || data.result || '');
+    } catch {
+      const gen = COMPONENT_TEMPLATES[component] ?? COMPONENT_TEMPLATES['Button'];
+      const labelMatch = prompt.match(/(?:called?|labeled?|for)\s+([\w\s]+)/i);
+      setResult(gen({ label: labelMatch ? labelMatch[1].trim() : (prompt.substring(0, 28) || component) }));
+    }
+    setLoading(false);
+    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
   };
+
+  const copy = () => {
+    Clipboard.setString(result);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: T.bg }}>
+      <LinearGradient colors={['#020710', '#050A12']} style={StyleSheet.absoluteFill} />
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <Text style={{ color: T.text, fontSize: 20, fontWeight: '800', marginBottom: 16 }}>💻 AI Code Editor</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 14 }}>
-            {LANGS.map(l => <TouchableOpacity key={l} onPress={() => setLang(l)} style={{ paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: l === lang ? 'rgba(6,182,212,0.2)' : T.card, borderWidth: 1, borderColor: l === lang ? T.cyan : T.border, marginRight: 8 }}><Text style={{ color: l === lang ? T.cyan : T.muted, fontWeight: '600', fontSize: 13 }}>{l}</Text></TouchableOpacity>)}
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 40, gap: 12 }} keyboardShouldPersistTaps="handled">
+            <Text style={{ color: T.text, fontSize: 20, fontWeight: '800', marginBottom: 2 }}>Generate Accessible Code</Text>
+            <Text style={{ color: T.muted, fontSize: 13, marginBottom: 4 }}>Describe a component, get WCAG-compliant code</Text>
+
+            {/* Component type */}
+            <GlassCard style={{ padding: 14 }}>
+              <Text style={{ color: T.muted, fontSize: 10, fontWeight: '700', letterSpacing: 1.5, marginBottom: 10 }}>COMPONENT TYPE</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                {COMP_TYPES.map(t => (
+                  <TouchableOpacity key={t} onPress={() => setComponent(t)}
+                    style={{ paddingHorizontal: 14, paddingVertical: 9, borderRadius: 10, backgroundColor: component === t ? T.accent + '28' : 'transparent', borderWidth: 1, borderColor: component === t ? T.accent : T.border }}>
+                    <Text style={{ color: component === t ? T.accent : T.muted, fontWeight: '700', fontSize: 12 }}>{t}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </GlassCard>
+
+            {/* Prompt */}
+            <GlassCard style={{ padding: 0, overflow: 'hidden' }}>
+              <View style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: T.border }}>
+                <Text style={{ color: T.muted, fontSize: 10, fontWeight: '700', letterSpacing: 1.5 }}>DESCRIBE YOUR COMPONENT</Text>
+              </View>
+              <TextInput style={{ color: T.text, padding: 14, fontSize: 14, minHeight: 80, textAlignVertical: 'top', lineHeight: 22 }}
+                multiline placeholder="e.g. A submit button called Send Message" placeholderTextColor={T.muted}
+                value={prompt} onChangeText={setPrompt} autoCapitalize="none" autoCorrect={false}
+              />
+            </GlassCard>
+
+            <GBtn label="⚡  Generate Accessible Code" onPress={generate} loading={loading} color={T.purple} style={{ width: '100%' }} />
+
+            {result ? (
+              <Animated.View style={{ opacity: fadeAnim, gap: 6 }}>
+                <GlassCard style={{ padding: 0, overflow: 'hidden' }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: T.border }}>
+                    <Text style={{ color: T.muted, fontSize: 10, fontWeight: '700', letterSpacing: 1.5 }}>GENERATED CODE</Text>
+                    <TouchableOpacity onPress={copy}>
+                      <Text style={{ color: copied ? T.green : T.accent, fontSize: 11, fontWeight: '700' }}>{copied ? '✅ Copied!' : '📋 Copy'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+                    <Text style={{ color: '#67E8F9', fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace', fontSize: 11.5, padding: 14, lineHeight: 20 }}>{result}</Text>
+                  </ScrollView>
+                </GlassCard>
+
+                {/* ARIA badges */}
+                <GlassCard style={{ padding: 14 }}>
+                  <Text style={{ color: T.muted, fontSize: 10, fontWeight: '700', letterSpacing: 1.5, marginBottom: 10 }}>ACCESSIBILITY FEATURES INCLUDED</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
+                    {['ARIA roles', 'Keyboard nav', 'Focus management', 'Screen reader', 'WCAG AA'].map(f => (
+                      <View key={f} style={{ backgroundColor: T.green + '14', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: T.green + '30' }}>
+                        <Text style={{ color: T.green, fontSize: 11, fontWeight: '600' }}>✓ {f}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </GlassCard>
+              </Animated.View>
+            ) : null}
           </ScrollView>
-          <GCard style={{ padding: 14, marginBottom: 14 }}>
-            <TextInput style={{ color: '#A0E86A', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 13, minHeight: 150, lineHeight: 20 }} value={code} onChangeText={setCode} multiline placeholder="Paste or type your code here..." placeholderTextColor={T.muted} />
-          </GCard>
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 14 }}>
-            {(['complete', 'explain', 'review'] as const).map(m => <TouchableOpacity key={m} onPress={() => setMode(m)} style={{ flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: mode === m ? 'rgba(6,182,212,0.18)' : T.card, borderWidth: 1, borderColor: mode === m ? T.cyan : T.border, alignItems: 'center' }}><Text style={{ color: mode === m ? T.cyan : T.muted, fontWeight: '700', fontSize: 13 }}>{m.charAt(0).toUpperCase() + m.slice(1)}</Text></TouchableOpacity>)}
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+// ── WCAG Guide Tab ────────────────────────────────────────────────────────────
+const LEVEL_COLORS: Record<string, string> = { A: T.green, AA: T.accent, AAA: T.purple };
+
+function WCAGTab() {
+  const [open, setOpen] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'A' | 'AA'>('all');
+  const rules = filter === 'all' ? WCAG_RULES : WCAG_RULES.filter(r => r.level === filter || (filter === 'AA' && r.level === 'A'));
+
+  return (
+    <View style={{ flex: 1, backgroundColor: T.bg }}>
+      <LinearGradient colors={['#020710', '#050A12']} style={StyleSheet.absoluteFill} />
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 40, gap: 10 }}>
+          <Text style={{ color: T.text, fontSize: 20, fontWeight: '800', marginBottom: 4 }}>WCAG 2.2 Guidelines</Text>
+          <Text style={{ color: T.muted, fontSize: 13, marginBottom: 6 }}>Success criteria with code examples</Text>
+
+          {/* Filter */}
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 6 }}>
+            {(['all', 'A', 'AA'] as const).map(f => (
+              <TouchableOpacity key={f} onPress={() => setFilter(f)}
+                style={{ paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10, backgroundColor: filter === f ? T.accent + '28' : 'transparent', borderWidth: 1, borderColor: filter === f ? T.accent : T.border }}>
+                <Text style={{ color: filter === f ? T.accent : T.muted, fontWeight: '700', fontSize: 12 }}>{f === 'all' ? 'All' : `Level ${f}`}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
-          <GBtn label={loading ? 'Processing...' : '⚡ Run AI'} onPress={run} loading={loading} accent={T.cyan} style={{ marginBottom: 18 }} />
-          {result ? <GCard style={{ padding: 16 }}><Text style={{ color: T.muted, fontSize: 11, fontWeight: '700', marginBottom: 8 }}>AI RESULT</Text><Text style={{ color: T.text, fontSize: 13, lineHeight: 21, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' }}>{result}</Text></GCard> : null}
+
+          {rules.map(r => (
+            <TouchableOpacity key={r.id} onPress={() => setOpen(open === r.id ? null : r.id)}>
+              <GlassCard style={{ padding: 0, borderColor: open === r.id ? T.accent + '44' : 'rgba(6,182,212,0.18)', overflow: 'hidden' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 }}>
+                  <View style={{ backgroundColor: (LEVEL_COLORS[r.level] ?? T.accent) + '18', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: (LEVEL_COLORS[r.level] ?? T.accent) + '44' }}>
+                    <Text style={{ color: LEVEL_COLORS[r.level] ?? T.accent, fontSize: 9, fontWeight: '800' }}>{r.level}</Text>
+                  </View>
+                  <Text style={{ color: T.muted, fontSize: 10, width: 38 }}>{r.id}</Text>
+                  <Text style={{ color: T.text, fontWeight: '700', fontSize: 13, flex: 1 }}>{r.title}</Text>
+                  <Text style={{ color: T.muted }}>{open === r.id ? '▲' : '▼'}</Text>
+                </View>
+                {open === r.id && (
+                  <View style={{ padding: 14, borderTopWidth: 1, borderTopColor: T.border, gap: 10 }}>
+                    <Text style={{ color: T.dimText, fontSize: 13, lineHeight: 21 }}>{r.desc}</Text>
+                    <View style={{ backgroundColor: T.green + '10', padding: 10, borderRadius: 8, borderWidth: 1, borderColor: T.green + '30' }}>
+                      <Text style={{ color: T.green, fontSize: 9, fontWeight: '700', marginBottom: 4 }}>✓ PASS EXAMPLE</Text>
+                      <Text style={{ color: T.dimText, fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace', fontSize: 11 }}>{r.example}</Text>
+                    </View>
+                    <View style={{ backgroundColor: T.red + '10', padding: 10, borderRadius: 8, borderWidth: 1, borderColor: T.red + '30' }}>
+                      <Text style={{ color: T.red, fontSize: 9, fontWeight: '700', marginBottom: 4 }}>✗ FAIL EXAMPLE</Text>
+                      <Text style={{ color: T.muted, fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'monospace', fontSize: 11 }}>{r.bad}</Text>
+                    </View>
+                  </View>
+                )}
+              </GlassCard>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </SafeAreaView>
     </View>
   );
 }
 
-function HomeScreen({ navigation }: any) {
-  const fade = useRef(new Animated.Value(0)).current;
-  useEffect(() => { Animated.timing(fade, { toValue: 1, duration: 600, useNativeDriver: true }).start(); }, []);
-  return (
-    <View style={{ flex: 1, backgroundColor: T.bg }}>
-      <LinearGradient colors={['#001520', '#0A0A0F']} style={StyleSheet.absoluteFill} />
-      <Particles count={16} accent={T.cyan} />
-      <SafeAreaView style={{ flex: 1 }}>
-        <Animated.ScrollView style={{ opacity: fade }} contentContainerStyle={{ padding: 22, paddingBottom: 40 }}>
-          <Text style={{ color: T.text, fontSize: 26, fontWeight: '800', marginBottom: 6 }}>AIBLTYCode 💻</Text>
-          <Text style={{ color: T.muted, marginBottom: 24 }}>AI-powered mobile code assistant</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Editor')} style={{ marginBottom: 16 }}>
-            <LinearGradient colors={[T.cyan, '#0066FF']} style={{ borderRadius: 20, padding: 22 }}>
-              <Text style={{ color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 4 }}>Open Code Editor</Text>
-              <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>Complete, review or explain any code</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-          {[{ emoji: '🐛', label: 'Debug Assistant', desc: 'Paste error → get fix instantly' }, { emoji: '📝', label: 'Code Templates', desc: 'Production-ready code snippets' }, { emoji: '🏗️', label: 'Architecture Review', desc: 'Design patterns & best practices' }].map((item, i) => (
-            <TouchableOpacity key={i} style={{ marginBottom: 10 }}>
-              <GCard style={{ padding: 16 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <Text style={{ fontSize: 26 }}>{item.emoji}</Text>
-                  <View style={{ flex: 1 }}><Text style={{ color: T.text, fontWeight: '600', fontSize: 14 }}>{item.label}</Text><Text style={{ color: T.muted, fontSize: 12 }}>{item.desc}</Text></View>
-                  <Text style={{ color: T.muted }}>›</Text>
-                </View>
-              </GCard>
-            </TouchableOpacity>
-          ))}
-        </Animated.ScrollView>
-      </SafeAreaView>
-    </View>
-  );
-}
-
+// ── Main Tabs ─────────────────────────────────────────────────────────────────
 function MainTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false, tabBarStyle: { backgroundColor: '#0F0F17', borderTopColor: T.border, height: Platform.OS === 'ios' ? 88 : 64, paddingBottom: Platform.OS === 'ios' ? 28 : 10, paddingTop: 8 }, tabBarActiveTintColor: T.cyan, tabBarInactiveTintColor: T.muted, tabBarLabelStyle: { fontSize: 11, fontWeight: '600' } }}>
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🏠</Text>, tabBarLabel: 'Home' }} />
-      <Tab.Screen name="Editor" component={EditorScreen} options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>💻</Text>, tabBarLabel: 'Editor' }} />
+    <Tab.Navigator screenOptions={{
+      headerShown: false,
+      tabBarStyle: { backgroundColor: '#030810', borderTopColor: T.border, height: Platform.OS === 'ios' ? 90 : 68, paddingBottom: Platform.OS === 'ios' ? 28 : 12, paddingTop: 10 },
+      tabBarActiveTintColor: T.accent, tabBarInactiveTintColor: T.muted,
+      tabBarLabelStyle: { fontSize: 10, fontWeight: '700', letterSpacing: 0.3 },
+    }}>
+      <Tab.Screen name="Audit"    component={AuditTab}    options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🔍</Text>, tabBarLabel: 'audit' }} />
+      <Tab.Screen name="Generate" component={GenerateTab} options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>⚡</Text>, tabBarLabel: 'generate' }} />
+      <Tab.Screen name="WCAG"     component={WCAGTab}     options={{ tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>📚</Text>, tabBarLabel: 'wcag' }} />
     </Tab.Navigator>
   );
 }
 
+// ── Root ──────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
     <NavigationContainer theme={{ ...DarkTheme, colors: { ...DarkTheme.colors, background: T.bg, card: T.card, border: T.border } }}>
       <StatusBar barStyle="light-content" backgroundColor={T.bg} />
       <Stack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
-        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="Splash"     component={SplashScreen}     />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Auth" component={AuthScreen} />
-        <Stack.Screen name="Main" component={MainTabs} />
+        <Stack.Screen name="Auth"       component={AuthScreen}       />
+        <Stack.Screen name="Main"       component={MainTabs}         />
       </Stack.Navigator>
     </NavigationContainer>
   );

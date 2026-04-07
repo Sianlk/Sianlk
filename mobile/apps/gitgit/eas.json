@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 7.0.0"
+    "version": ">= 10.0.0"
   },
   "build": {
     "development": {
@@ -16,17 +16,24 @@
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "ios": {
+        "resourceClass": "m1-medium"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {
     "production": {
       "ios": {
         "appleId": "hosturserver@gmail.com",
-        "ascAppId": "REPLACE_WITH_APP_STORE_ID"
+        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_ID",
+        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
       },
       "android": {
-        "serviceAccountKeyPath": "../google-service-account.json",
+        "serviceAccountKeyPath": "./google-service-account.json",
         "track": "production"
       }
     }

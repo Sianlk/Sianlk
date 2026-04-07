@@ -1,33 +1,37 @@
 {
   "expo": {
-    "name": "AIBLTY",
+    "name": "Aiblty Health",
     "slug": "aiblty",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0A0A0F"
+      "backgroundColor": "#0A1A0A"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.sianlk.aiblty",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
-        "NSCameraUsageDescription": "AIBLTY uses camera for AI-powered features",
-        "NSMicrophoneUsageDescription": "AIBLTY uses microphone for voice input",
-        "NSPhotoLibraryUsageDescription": "AIBLTY accesses photos for AI analysis"
+        "NSCameraUsageDescription": "Aiblty Health uses camera for AI-powered features",
+        "NSMicrophoneUsageDescription": "Aiblty Health uses microphone for voice AI input",
+        "NSPhotoLibraryUsageDescription": "Aiblty Health accesses photos for AI analysis features",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0A0A0F"
+        "backgroundColor": "#0A1A0A"
       },
       "package": "com.sianlk.aiblty",
-      "versionCode": 1,
+      "versionCode": 2,
       "permissions": [
         "INTERNET",
         "CAMERA",
@@ -36,6 +40,10 @@
         "READ_EXTERNAL_STORAGE"
       ]
     },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
     "plugins": [
       "expo-linear-gradient",
       "expo-blur"
@@ -43,9 +51,11 @@
     "extra": {
       "apiBase": "https://sianlk-unified-9w6jz.ondigitalocean.app",
       "appSlug": "aiblty",
-      "proPriceUsd": 4.99,
+      "proPriceGbp": 12.99,
+      "privacyPolicy": "https://sianlk.com/privacy",
+      "termsOfService": "https://sianlk.com/terms",
       "eas": {
-        "projectId": "sianlk-aiblty-001"
+        "projectId": "sianlk-aiblty-v1"
       }
     },
     "owner": "sianlk"

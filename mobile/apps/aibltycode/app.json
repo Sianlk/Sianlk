@@ -1,33 +1,37 @@
 {
   "expo": {
-    "name": "AIBLTYCode",
+    "name": "AibltyCode",
     "slug": "aibltycode",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0A0A0F"
+      "backgroundColor": "#0A0A1A"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.sianlk.aibltycode",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
-        "NSCameraUsageDescription": "AIBLTYCode uses camera for AI-powered features",
-        "NSMicrophoneUsageDescription": "AIBLTYCode uses microphone for voice input",
-        "NSPhotoLibraryUsageDescription": "AIBLTYCode accesses photos for AI analysis"
+        "NSCameraUsageDescription": "AibltyCode uses camera for AI-powered features",
+        "NSMicrophoneUsageDescription": "AibltyCode uses microphone for voice AI input",
+        "NSPhotoLibraryUsageDescription": "AibltyCode accesses photos for AI analysis features",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0A0A0F"
+        "backgroundColor": "#0A0A1A"
       },
       "package": "com.sianlk.aibltycode",
-      "versionCode": 1,
+      "versionCode": 2,
       "permissions": [
         "INTERNET",
         "CAMERA",
@@ -36,6 +40,10 @@
         "READ_EXTERNAL_STORAGE"
       ]
     },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
     "plugins": [
       "expo-linear-gradient",
       "expo-blur"
@@ -43,9 +51,11 @@
     "extra": {
       "apiBase": "https://sianlk-unified-9w6jz.ondigitalocean.app",
       "appSlug": "aibltycode",
-      "proPriceUsd": 14.99,
+      "proPriceGbp": 9.99,
+      "privacyPolicy": "https://sianlk.com/privacy",
+      "termsOfService": "https://sianlk.com/terms",
       "eas": {
-        "projectId": "sianlk-aibltycode-001"
+        "projectId": "sianlk-aibltycode-v1"
       }
     },
     "owner": "sianlk"

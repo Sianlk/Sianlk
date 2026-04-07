@@ -1,33 +1,37 @@
 {
   "expo": {
-    "name": "GeniQX",
+    "name": "GenIQX Quantum",
     "slug": "geniqx",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0A0A0F"
+      "backgroundColor": "#000A1A"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.sianlk.geniqx",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
-        "NSCameraUsageDescription": "GeniQX uses camera for AI-powered features",
-        "NSMicrophoneUsageDescription": "GeniQX uses microphone for voice input",
-        "NSPhotoLibraryUsageDescription": "GeniQX accesses photos for AI analysis"
+        "NSCameraUsageDescription": "GenIQX Quantum uses camera for AI-powered features",
+        "NSMicrophoneUsageDescription": "GenIQX Quantum uses microphone for voice AI input",
+        "NSPhotoLibraryUsageDescription": "GenIQX Quantum accesses photos for AI analysis features",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0A0A0F"
+        "backgroundColor": "#000A1A"
       },
       "package": "com.sianlk.geniqx",
-      "versionCode": 1,
+      "versionCode": 2,
       "permissions": [
         "INTERNET",
         "CAMERA",
@@ -36,6 +40,10 @@
         "READ_EXTERNAL_STORAGE"
       ]
     },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
     "plugins": [
       "expo-linear-gradient",
       "expo-blur"
@@ -43,9 +51,11 @@
     "extra": {
       "apiBase": "https://sianlk-unified-9w6jz.ondigitalocean.app",
       "appSlug": "geniqx",
-      "proPriceUsd": 34.99,
+      "proPriceGbp": 14.99,
+      "privacyPolicy": "https://sianlk.com/privacy",
+      "termsOfService": "https://sianlk.com/terms",
       "eas": {
-        "projectId": "sianlk-geniqx-001"
+        "projectId": "sianlk-geniqx-v1"
       }
     },
     "owner": "sianlk"

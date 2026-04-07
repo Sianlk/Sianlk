@@ -55,9 +55,13 @@
       "privacyPolicy": "https://sianlk.com/privacy",
       "termsOfService": "https://sianlk.com/terms",
       "eas": {
-        "projectId": "sianlk-aib-v1"
+        "projectId": "f1c7ae11-699a-480e-b26a-b291cb2a053f"
       }
     },
-    "owner": "sianlk"
+    "owner": "sianlk",
+    "updates": {
+      "url": "https://u.expo.dev/f1c7ae11-699a-480e-b26a-b291cb2a053f",
+      "enabled": true
+    }
   }
 }

@@ -55,9 +55,13 @@
       "privacyPolicy": "https://sianlk.com/privacy",
       "termsOfService": "https://sianlk.com/terms",
       "eas": {
-        "projectId": "sianlk-gitgit-v1"
+        "projectId": "f52164c7-f0cc-44f8-b268-6760313fc37a"
       }
     },
-    "owner": "sianlk"
+    "owner": "sianlk",
+    "updates": {
+      "url": "https://u.expo.dev/f52164c7-f0cc-44f8-b268-6760313fc37a",
+      "enabled": true
+    }
   }
 }

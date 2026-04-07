@@ -351,12 +351,12 @@ function ValuateTab() {
               <GCard style={{ padding: 22, marginBottom: 14, alignItems: 'center' }}>
                 <Text style={{ color: T.muted, fontSize: 11, fontWeight: '700', letterSpacing: 1.5, marginBottom: 6 }}>ESTIMATED VALUE</Text>
                 <Text style={{ color: T.accent, fontSize: 40, fontWeight: '900', marginBottom: 4 }}>
-                  ${(result.estimated_value / 1_000_000).toFixed(2)}M
+                  £{(result.estimated_value / 1_000_000).toFixed(2)}M
                 </Text>
                 <Text style={{ color: T.muted, fontSize: 13, marginBottom: 12 }}>
-                  Range: ${(result.low_estimate / 1_000_000).toFixed(2)}M – ${(result.high_estimate / 1_000_000).toFixed(2)}M
+                  Range: £{(result.low_estimate / 1_000_000).toFixed(2)}M – £{(result.high_estimate / 1_000_000).toFixed(2)}M
                 </Text>
-                <Text style={{ color: T.muted, fontSize: 13 }}>${result.price_per_sqft?.toFixed(0)}/sqft · ±{result.uncertainty_pct?.toFixed(1)}% uncertainty</Text>
+                <Text style={{ color: T.muted, fontSize: 13 }}>£{result.price_per_sqft?.toFixed(0)}/sqft · ±{result.uncertainty_pct?.toFixed(1)}% uncertainty</Text>
               </GCard>
 
               {/* Investment score */}
@@ -435,7 +435,7 @@ function SearchTab({ navigation }: any) {
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View style={{ alignItems: 'center' }}>
-                    <Text style={{ color: T.accent, fontSize: 17, fontWeight: '800' }}>${(item.price / 1_000_000).toFixed(1)}M</Text>
+                    <Text style={{ color: T.accent, fontSize: 17, fontWeight: '800' }}>£{(item.price / 1_000_000).toFixed(1)}M</Text>
                     <Text style={{ color: T.muted, fontSize: 10 }}>Price</Text>
                   </View>
                   <View style={{ alignItems: 'center' }}>
@@ -530,7 +530,7 @@ function PortfolioTab() {
           <Text style={{ color: T.text, fontSize: 22, fontWeight: '800', marginBottom: 20 }}>💼 My Portfolio</Text>
           <GCard style={{ padding: 22, marginBottom: 18, alignItems: 'center' }}>
             <Text style={{ color: T.muted, fontSize: 11, fontWeight: '700', letterSpacing: 1.5, marginBottom: 8 }}>TOTAL PORTFOLIO VALUE</Text>
-            <Text style={{ color: T.accent, fontSize: 38, fontWeight: '900', marginBottom: 6 }}>${(totalValue / 1_000_000).toFixed(2)}M</Text>
+            <Text style={{ color: T.accent, fontSize: 38, fontWeight: '900', marginBottom: 6 }}>£{(totalValue / 1_000_000).toFixed(2)}M</Text>
             <View style={{ backgroundColor: T.accent + '22', paddingHorizontal: 14, paddingVertical: 5, borderRadius: 20 }}>
               <Text style={{ color: T.accent, fontWeight: '700', fontSize: 14 }}>↑ +{avgChange.toFixed(1)}% avg YoY</Text>
             </View>
@@ -543,7 +543,7 @@ function PortfolioTab() {
                   <Text style={{ color: T.muted, fontSize: 12, marginTop: 3 }}>{p.type}</Text>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
-                  <Text style={{ color: T.accent, fontSize: 16, fontWeight: '800' }}>${(p.value / 1_000_000).toFixed(1)}M</Text>
+                  <Text style={{ color: T.accent, fontSize: 16, fontWeight: '800' }}>£{(p.value / 1_000_000).toFixed(1)}M</Text>
                   <Text style={{ color: p.change >= 0 ? T.accent : T.red, fontSize: 13, fontWeight: '600' }}>
                     {p.change >= 0 ? '↑' : '↓'} {Math.abs(p.change)}%
                   </Text>

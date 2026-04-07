@@ -1,29 +1,69 @@
-name: Store Publish
+name: EAS Build & Publish
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
+      app:
+        description: 'App slug to build (or "all")'
+        required: true
+        default: 'all'
+        type: string
       platform:
-        description: 'Platform to build'
+        description: 'Platform'
         required: true
         default: 'all'
         type: choice
         options: [all, ios, android]
       profile:
-        description: 'EAS build profile'
+        description: 'EAS profile'
         required: true
         default: 'production'
         type: choice
         options: [development, preview, production]
+      submit:
+        description: 'Submit to stores after build?'
+        required: false
+        default: 'false'
+        type: boolean
+      ota_update:
+        description: 'Push OTA update?'
+        required: false
+        default: 'true'
+        type: boolean
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+concurrency:
+  group: eas-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build-and-submit:
-    name: EAS Build & Submit
+  # ── Determine which apps to build ──────────────────────────────────────────
+  matrix-gen:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - id: gen
+        run: |
+          ALL='["sianlk","geniai","aiaesthetics","aib","aiblty","aibltycode","buildquote","comppropdata","terminalai","gitgit","geniqx"]'
+          APP="${{ github.event.inputs.app || 'all' }}"
+          if [ "$APP" = "all" ] || [ -z "$APP" ]; then
+            echo "matrix={"slug":$ALL}" >> "$GITHUB_OUTPUT"
+          else
+            echo "matrix={"slug":["$APP"]}" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── Build each app ─────────────────────────────────────────────────────────
+  build:
+    needs: matrix-gen
+    name: "Build ${{ matrix.slug }}"
     runs-on: ubuntu-latest
     environment: production
+    strategy:
+      matrix: ${{ fromJson(needs.matrix-gen.outputs.matrix) }}
+      fail-fast: false
     steps:
       - uses: actions/checkout@v4
 
@@ -31,32 +71,86 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: mobile/apps/${{ matrix.slug }}/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install EAS CLI
+        run: npm install -g eas-cli@latest
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
+      - name: Install app dependencies
+        working-directory: mobile/apps/${{ matrix.slug }}
+        run: |
+          npm ci --prefer-offline 2>/dev/null || npm install
+
+      - name: Validate EAS config
+        working-directory: mobile/apps/${{ matrix.slug }}
+        run: eas config --platform all
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: EAS Build
+        id: build
+        working-directory: mobile/apps/${{ matrix.slug }}
+        run: |
+          eas build \
+            --platform ${{ github.event.inputs.platform || 'all' }} \
+            --profile ${{ github.event.inputs.profile || 'production' }} \
+            --non-interactive \
+            --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Push OTA Update
+        if: >
+          (github.event.inputs.ota_update == 'true' || startsWith(github.ref, 'refs/tags/')) &&
+          github.event.inputs.profile != 'development'
+        working-directory: mobile/apps/${{ matrix.slug }}
+        run: |
+          eas update \
+            --branch ${{ github.event.inputs.profile || 'production' }} \
+            --message "Release ${{ github.ref_name || github.sha }} — ${{ matrix.slug }}" \
+            --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  # ── Submit to stores (requires Apple/Google credentials) ───────────────────
+  submit:
+    needs: [matrix-gen, build]
+    if: >
+      vars.ENABLE_STORE_SUBMIT == 'true' &&
+      (startsWith(github.ref, 'refs/tags/') || github.event.inputs.submit == 'true')
+    name: "Submit ${{ matrix.slug }}"
+    runs-on: ubuntu-latest
+    environment: store-submission
+    strategy:
+      matrix: ${{ fromJson(needs.matrix-gen.outputs.matrix) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          node-version: '20'
 
-      - name: Build iOS (production)
-        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'ios'
+      - name: Install EAS CLI
+        run: npm install -g eas-cli@latest
+
+      - name: Write Google Service Account
+        if: env.GOOGLE_SERVICE_ACCOUNT_JSON != ''
         run: |
-          eas build --platform ios --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive
+          echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}' > /tmp/google-sa.json
+          echo "GOOGLE_SERVICE_ACCOUNT_PATH=/tmp/google-sa.json" >> $GITHUB_ENV
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
 
-      - name: Build Android (production)
-        if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'android'
+      - name: Submit to stores
+        working-directory: mobile/apps/${{ matrix.slug }}
         run: |
-          eas build --platform android --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive
+          eas submit \
+            --platform ${{ github.event.inputs.platform || 'all' }} \
+            --latest \
+            --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Submit to App Stores
-        if: startsWith(github.ref, 'refs/tags/')
-        run: eas submit --platform all --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_APPLE_TEAM_ID: ${{ secrets.EXPO_APPLE_TEAM_ID }}
+          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.EXPO_APPLE_APP_SPECIFIC_PASSWORD }}
+          GOOGLE_SERVICE_ACCOUNT_PATH: ${{ env.GOOGLE_SERVICE_ACCOUNT_PATH }}

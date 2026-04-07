@@ -1447,7 +1447,922 @@ function ResearchTab() {
   );
 }
 
-// â”€â”€â”€ Main Tab Navigator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+// ─── Genomics, Biochemistry & Cure Discovery Tab ────────────────────────────
+
+const GENOME_DISEASES = [
+  { id:'gd1', name:'Cystic Fibrosis', gene:'CFTR', chromosome:'7q31.2', mutation:'ΔF508 deletion', prevalence:'1:2500 (Caucasian)', mechanism:'Dysfunctional chloride transport → mucus accumulation', current:'CFTR modulators (Trikafta/Elexacaftor)', pipeline:['mRNA therapy (restoring CFTR transcript)','Base editing at codon 508','Lenti-viral gene insertion — Phase II'], category:'Rare', emoji:'🫁' },
+  { id:'gd2', name:'Huntington\'s Disease', gene:'HTT', chromosome:'4p16.3', mutation:'CAG repeat expansion >36', prevalence:'1:10,000', mechanism:'Polyglutamine tract causes protein aggregation → striatal neurodegeneration', current:'Symptom management (tetrabenazine, antipsychotics)', pipeline:['HTT antisense oligonucleotides (tominersen)','CRISPR-Cas9 CAG repeat silencing — Phase I','RNA interference — nusinersen variant'], category:'Rare', emoji:'🧠' },
+  { id:'gd3', name:'Sickle Cell Disease', gene:'HBB', chromosome:'11p15.5', mutation:'c.20A>T (p.Glu7Val)', prevalence:'1:365 (African-American)', mechanism:'Haemoglobin S polymerisation → RBC sickling → vaso-occlusion', current:'Hydroxyurea, transfusions, Voxelotor', pipeline:['Casgevy (Exa-cel CRISPR — FDA approved 2023)','lentiviral beta-globin addition','mRNA BCL11A silencing to reactivate foetal Hb'], category:'Common', emoji:'🩸' },
+  { id:'gd4', name:'BRCA1/2 Breast Cancer', gene:'BRCA1/2', chromosome:'17q21 / 13q12', mutation:'Frameshift/truncating (1,800+ variants)', prevalence:'1:400 general; 1:40 Ashkenazi', mechanism:'Loss of homologous recombination repair → genomic instability → cancer', current:'PARP inhibitors (Olaparib), prophylactic surgery', pipeline:['CRISPR restoration of BRCA1 function','Neoantigen vaccine (personalised mRNA)','PD-L1 combination immunotherapy'], category:'Oncology', emoji:'🎀' },
+  { id:'gd5', name:'Alzheimer\'s Disease', gene:'APOE4 / APP / PSEN1', chromosome:'19q13 / 21q21 / 14q24', mutation:'APOE ε4 allele, APP duplications', prevalence:'50M worldwide (2030 projection: 153M)', mechanism:'Aβ plaque accumulation + tau hyperphosphorylation → synaptic failure', current:'Lecanemab (anti-Aβ mAb), Donepezil', pipeline:['Anti-tau CRISPR silencing','APOE4 → APOE2 base editing','Neuroinflammation IL-33 pathway inhibitors'], category:'Neurological', emoji:'🧩' },
+  { id:'gd6', name:'Duchenne Muscular Dystrophy', gene:'DMD', chromosome:'Xp21.2', mutation:'Deletion exons 45-55 (frameshift)', prevalence:'1:3500 males', mechanism:'Absent dystrophin → sarcolemmal instability → progressive muscle necrosis', current:'Exon-skipping (Eteplirsen, Golodirsen)', pipeline:['Micro-dystrophin AAV gene therapy (SRP-9001)','Prime editing to correct reading frame','Utrophin upregulation — ezutromid'], category:'Rare', emoji:'💪' },
+  { id:'gd7', name:'Type 1 Diabetes', gene:'HLA-DR3/DR4, INS, PTPN22', chromosome:'6p21 / 11p15 / 1p13', mutation:'Polygenic risk — HLA haplotypes', prevalence:'1:300 (developed world)', mechanism:'Autoimmune T-cell destruction of pancreatic β-cells', current:'Basal-bolus insulin, CGM systems', pipeline:['Teplizumab (anti-CD3, delay-to-T1D)','Encapsulated islet transplant (ViaCyte)','CRISPR HLA-editing donor islets to evade immune rejection'], category:'Autoimmune', emoji:'🩺' },
+  { id:'gd8', name:'Progeria (HGPS)', gene:'LMNA', chromosome:'1q22', mutation:'c.1824C>T (p.Gly608Gly) — cryptic splice', prevalence:'1:18,000,000', mechanism:'Progerin accumulation → nuclear blebbing → accelerated senescence', current:'Lonafarnib (FTI — FDA approved 2020)', pipeline:['C6839G base edit to prevent cryptic splice','Lonafarnib + Everolimus + Pravastatin triple','AAV-mediated LMNA correction — murine cure 2022'], category:'Ultra-rare', emoji:'⏩' },
+  { id:'gd9', name:'Phenylketonuria', gene:'PAH', chromosome:'12q23.2', mutation:'p.Arg408Trp (most common)', prevalence:'1:10,000', mechanism:'Phenylalanine hydroxylase deficiency → Phe accumulation → neurotoxicity', current:'Phenylalanine-restricted diet, Sapropterin (BH4)', pipeline:['PAH mRNA therapeutic (Intellia IND 2024)','AAV-PAH hepatic gene therapy — Phase II','CRISPR correction of Arg408Trp — base edit'], category:'Metabolic', emoji:'🧪' },
+  { id:'gd10', name:'Spinal Muscular Atrophy', gene:'SMN1', chromosome:'5q13.2', mutation:'Homozygous deletion exon 7', prevalence:'1:6000–10,000', mechanism:'Loss of SMN protein → anterior horn motor neuron death', current:'Nusinersen, Zolgensma (AAV9-SMN1), Risdiplam', pipeline:['Next-gen AAV-SMN1 — lower immune profile','SMN2 splicing enhancers (small molecule)','Combination Zolgensma+Risdiplam trial'], category:'Rare', emoji:'🦿' },
+];
+
+const BIOCHEM_PATHWAYS = [
+  { id:'bp1', name:'mTOR Signalling', role:'Nutrient sensing, cell growth, cancer switch', drugs:['Rapamycin (mTORC1 inhibitor)','Everolimus (oncology)','Torin — dual mTORC1/2'], diseases:['Cancer','TSC','Aging','Metabolic syndrome'], targets:['mTORC1','mTORC2','Raptor','Rictor'], emoji:'⚙️' },
+  { id:'bp2', name:'NF-κB Inflammation', role:'Master regulator of immune/inflammatory gene expression', drugs:['IKK inhibitors','Bortezomib (proteasome)','Sulfasalazine'], diseases:['Rheumatoid arthritis','IBD','Cancer','Sepsis'], targets:['IκBα','IKKβ','p65 RelA','TAK1'], emoji:'🔥' },
+  { id:'bp3', name:'p53 Tumour Suppression', role:'Guardian of the genome — apoptosis, cell cycle arrest, DNA repair', drugs:['APR-246 (mutant p53 rescue)','MDM2 inhibitors (Nutlins)','PRIMA-1Met'], diseases:['50% of all cancers','Li-Fraumeni syndrome'], targets:['MDM2','MDMX','p21','Bax'], emoji:'🛡️' },
+  { id:'bp4', name:'CRISPR-Cas9 Machinery', role:'Precision genome editing — cut, correct, silence, activate', drugs:['Casgevy (sickle cell)','NTLA-2001 (transthyretin amyloidosis)','CTX001'], diseases:['Any monogenic disease','Cancer','Infectious disease'], targets:['Cas9','sgRNA','PAM site','HDR/NHEJ pathways'], emoji:'✂️' },
+  { id:'bp5', name:'Wnt/β-catenin Pathway', role:'Development, stem cell renewal, cancer progression', drugs:['LGK-974 (Porcupine inhibitor)','PRI-724','SM04690 (OA cartilage regeneration)'], diseases:['Colorectal cancer','Hepatocellular carcinoma','Osteoarthritis'], targets:['β-catenin','APC','GSK3β','Frizzled'], emoji:'🌀' },
+  { id:'bp6', name:'PI3K/AKT/mTOR', role:'Cell survival, proliferation, metabolism', drugs:['Alpelisib (PIK3CA Breast Ca)','Idelalisib (CLL)','Copanlisib'], diseases:['Breast cancer','CLL','PTEN hamartoma','Cowden syndrome'], targets:['PI3Kα','AKT1','PTEN','PDK1'], emoji:'🔗' },
+];
+
+const CURE_PIPELINE = [
+  { id:'cp1', disease:'Pancreatic Cancer', stage:'Phase III', approach:'mRNA personalised neoantigen vaccine + PD-1 (BNT122)', survival:'18-month OS improvement 44%→58% (interim)', confidence:72, emoji:'🎗️' },
+  { id:'cp2', disease:'ALS (MND)', stage:'Phase II', approach:'SOD1-ASO + TDP-43 stabiliser combination', survival:'Progression-free at 12m: 61% vs 29% placebo', confidence:58, emoji:'⚡' },
+  { id:'cp3', disease:'HIV Cure', stage:'Phase I', approach:'broadly neutralising antibodies (bNAbs) + latency reversal agent', survival:'Sustained viral remission 12m post-ART cessation: 3/12 patients', confidence:41, emoji:'🔴' },
+  { id:'cp4', disease:'Glioblastoma (GBM)', stage:'Phase II', approach:'CAR-T targeting EGFRvIII + IL-13Rα2 bispecific + oncolytic virus', survival:'mOS extended 15→22 months', confidence:63, emoji:'🧠' },
+  { id:'cp5', disease:'Prion Disease (CJD)', stage:'Preclinical', approach:'Anti-prion ASO IND-filed 2024 (unlocking PRNP silencing)', survival:'Murine cure 100% — human IND pending', confidence:34, emoji:'⚠️' },
+  { id:'cp6', disease:'Type 2 Diabetes Reversal', stage:'Approved', approach:'Dual GIP/GLP-1 agonist Tirzepatide — complete T2D remission', survival:'86% remission at 2y (SURMOUNT-3)', confidence:91, emoji:'✅' },
+];
+
+function GenomicsTab() {
+  const [view, setView]           = useState<'diseases'|'pathways'|'pipeline'|'search'>('diseases');
+  const [selectedDisease, setSel] = useState<typeof GENOME_DISEASES[0]|null>(null);
+  const [searchQ, setSearchQ]     = useState('');
+  const [scanMode, setScanMode]   = useState(false);
+  const [scanStep, setScanStep]   = useState(0);
+  const [scanResult, setScanResult] = useState<string[]>([]);
+  const evolveAnim = useRef(new Animated.Value(0)).current;
+  const scanAnim   = useRef(new Animated.Value(0)).current;
+
+  const CAT_COLORS: Record<string,string> = {
+    Rare: T.purple, Common: T.cyan, Oncology: T.red, Neurological: T.lavender,
+    Autoimmune: T.orange, Metabolic: T.green, 'Ultra-rare': T.gold,
+  };
+
+  const SCAN_STEPS = [
+    'Initialising whole-genome sequencer...','Aligning reads to GRCh38 reference...','Variant calling (SNPs, indels, CNVs)...','Cross-referencing ClinVar + OMIM databases...','Pharmacogenomics panel analysis...','Rare disease matching (7,800+ conditions)...','Generating therapeutic target map...','Report ready',
+  ];
+
+  const runGenomeScan = async () => {
+    setScanMode(true); setScanStep(0); setScanResult([]);
+    Animated.loop(Animated.sequence([
+      Animated.timing(scanAnim, { toValue:1, duration:800, useNativeDriver:true }),
+      Animated.timing(scanAnim, { toValue:0, duration:800, useNativeDriver:true }),
+    ])).start();
+    for (let i = 0; i < SCAN_STEPS.length; i++) {
+      await new Promise(r => setTimeout(r, 900));
+      setScanStep(i);
+    }
+    setScanResult([
+      'Variant found: BRCA2 c.8149T>C (Pathogenic)','Pharmacogenomics: CYP2C19 *2/*2 — poor metaboliser (avoid clopidogrel)','APOE: ε3/ε4 — elevated Alzheimer\'s risk (26%)','HLA: DRB1*04:01 — RA susceptibility','Rare disease match: NONE detected','Polygenic risk: Cardiovascular 34th percentile (low-moderate)','Carrier status: Cystic Fibrosis (F508del heterozygous)',
+    ]);
+    Animated.timing(evolveAnim, { toValue:1, duration:1200, useNativeDriver:true }).start();
+  };
+
+  const diseases = searchQ
+    ? GENOME_DISEASES.filter(d => d.name.toLowerCase().includes(searchQ.toLowerCase()) || d.gene.toLowerCase().includes(searchQ.toLowerCase()) || d.category.toLowerCase().includes(searchQ.toLowerCase()))
+    : GENOME_DISEASES;
+
+  if (selectedDisease) {
+    const d = selectedDisease;
+    const cc = CAT_COLORS[d.category] || T.accent;
+    return (
+      <View style={{ flex:1, backgroundColor:T.bg }}>
+        <LinearGradient colors={['#010106','#030208']} style={StyleSheet.absoluteFill} />
+        <SafeAreaView style={{ flex:1 }}>
+          <View style={{ padding:18, borderBottomWidth:1, borderBottomColor:T.border }}>
+            <TouchableOpacity onPress={() => setSel(null)}>
+              <Text style={{ color:T.muted, fontSize:13 }}>← Diseases</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView contentContainerStyle={{ padding:18, paddingBottom:40, gap:14 }}>
+            <View style={{ flexDirection:'row', alignItems:'center', gap:12 }}>
+              <Text style={{ fontSize:42 }}>{d.emoji}</Text>
+              <View style={{ flex:1 }}>
+                <Text style={{ color:T.text, fontSize:20, fontWeight:'900' }}>{d.name}</Text>
+                <View style={{ flexDirection:'row', gap:8, marginTop:4, flexWrap:'wrap' }}>
+                  <View style={{ backgroundColor:cc+'22', paddingHorizontal:8, paddingVertical:3, borderRadius:6, borderWidth:1, borderColor:cc+'44' }}>
+                    <Text style={{ color:cc, fontSize:10, fontWeight:'700' }}>{d.category}</Text>
+                  </View>
+                  <View style={{ backgroundColor:T.border+'80', paddingHorizontal:8, paddingVertical:3, borderRadius:6 }}>
+                    <Text style={{ color:T.dimText, fontSize:10 }}>Gene: {d.gene}</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            <GlassCard style={{ padding:16, gap:10 }}>
+              <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5 }}>GENOMIC LOCATION</Text>
+              <View style={{ flexDirection:'row', gap:10 }}>
+                <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.4)', padding:10, borderRadius:10, alignItems:'center' }}>
+                  <Text style={{ color:T.text, fontWeight:'800', fontSize:13 }}>{d.chromosome}</Text>
+                  <Text style={{ color:T.muted, fontSize:10 }}>Chromosome locus</Text>
+                </View>
+                <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.4)', padding:10, borderRadius:10, alignItems:'center' }}>
+                  <Text style={{ color:T.gold, fontWeight:'800', fontSize:11 }}>{d.mutation}</Text>
+                  <Text style={{ color:T.muted, fontSize:10 }}>Mutation</Text>
+                </View>
+              </View>
+              <View style={{ backgroundColor:'rgba(0,0,0,0.4)', padding:10, borderRadius:10 }}>
+                <Text style={{ color:T.muted, fontSize:9, marginBottom:4 }}>PREVALENCE</Text>
+                <Text style={{ color:T.text, fontSize:12 }}>{d.prevalence}</Text>
+              </View>
+            </GlassCard>
+
+            <GlassCard style={{ padding:16 }}>
+              <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:10 }}>⚙️ DISEASE MECHANISM</Text>
+              <Text style={{ color:T.text, fontSize:13, lineHeight:22 }}>{d.mechanism}</Text>
+            </GlassCard>
+
+            <GlassCard style={{ padding:16 }}>
+              <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:10 }}>💊 CURRENT TREATMENT</Text>
+              <Text style={{ color:T.dimText, fontSize:13, lineHeight:21 }}>{d.current}</Text>
+            </GlassCard>
+
+            <GlassCard style={{ padding:16 }}>
+              <Text style={{ color:T.green, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:10 }}>🧬 GENE THERAPY PIPELINE</Text>
+              {d.pipeline.map((p,i) => (
+                <View key={i} style={{ flexDirection:'row', gap:10, paddingVertical:8, alignItems:'flex-start', borderTopWidth:i===0?0:1, borderTopColor:T.border }}>
+                  <View style={{ width:22, height:22, borderRadius:11, backgroundColor:T.green+'28', borderWidth:1, borderColor:T.green+'50', alignItems:'center', justifyContent:'center', marginTop:1 }}>
+                    <Text style={{ color:T.green, fontSize:10, fontWeight:'800' }}>{i+1}</Text>
+                  </View>
+                  <Text style={{ color:T.dimText, flex:1, fontSize:12, lineHeight:19 }}>{p}</Text>
+                </View>
+              ))}
+            </GlassCard>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex:1, backgroundColor:T.bg }}>
+      <LinearGradient colors={['#010106','#030208']} style={StyleSheet.absoluteFill} />
+      <SafeAreaView style={{ flex:1 }}>
+        <ScrollView contentContainerStyle={{ padding:18, paddingBottom:40, gap:12 }}>
+          <Text style={{ color:T.text, fontSize:20, fontWeight:'900' }}>Genomics & Cure Discovery</Text>
+          <Text style={{ color:T.muted, fontSize:12, marginBottom:4 }}>Genome analysis · Rare disease · Biochemistry · Self-evolving pipeline</Text>
+
+          {/* Tab selector */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap:8 }}>
+            {(['diseases','pathways','pipeline','search'] as const).map(v => {
+              const labels: Record<string,string> = { diseases:'🧬 Diseases', pathways:'⚗️ Biochem', pipeline:'🚀 Pipeline', search:'🔍 Scan+Search' };
+              return (
+                <TouchableOpacity key={v} onPress={() => setView(v)}
+                  style={{ paddingVertical:9, paddingHorizontal:14, borderRadius:12, backgroundColor:view===v?T.purple+'30':'transparent', borderWidth:1, borderColor:view===v?T.purple:T.border }}>
+                  <Text style={{ color:view===v?T.lavender:T.muted, fontWeight:'700', fontSize:12 }}>{labels[v]}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/* DISEASES VIEW */}
+          {view === 'diseases' && (<>
+            <TextInput
+              style={{ color:T.text, backgroundColor:T.border+'88', borderRadius:12, borderWidth:1, borderColor:T.border, padding:13, fontSize:14 }}
+              placeholder="Search disease, gene, category..." placeholderTextColor={T.muted}
+              value={searchQ} onChangeText={setSearchQ}
+            />
+            {diseases.map(d => {
+              const cc = CAT_COLORS[d.category] || T.accent;
+              return (
+                <TouchableOpacity key={d.id} onPress={() => setSel(d)}>
+                  <GlassCard style={{ padding:14 }}>
+                    <View style={{ flexDirection:'row', alignItems:'center', gap:12 }}>
+                      <View style={{ width:50, height:50, borderRadius:14, backgroundColor:cc+'18', borderWidth:1, borderColor:cc+'40', alignItems:'center', justifyContent:'center' }}>
+                        <Text style={{ fontSize:26 }}>{d.emoji}</Text>
+                      </View>
+                      <View style={{ flex:1 }}>
+                        <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
+                          <Text style={{ color:T.text, fontWeight:'800', fontSize:13 }}>{d.name}</Text>
+                          <View style={{ backgroundColor:cc+'22', paddingHorizontal:7, paddingVertical:2, borderRadius:5, borderWidth:1, borderColor:cc+'44' }}>
+                            <Text style={{ color:cc, fontSize:9, fontWeight:'700' }}>{d.category}</Text>
+                          </View>
+                        </View>
+                        <Text style={{ color:T.gold, fontSize:11, marginTop:2 }}>Gene: <Text style={{ fontWeight:'700' }}>{d.gene}</Text> · {d.chromosome}</Text>
+                        <Text style={{ color:T.muted, fontSize:10, marginTop:2 }}>{d.mutation}</Text>
+                      </View>
+                    </View>
+                    <View style={{ flexDirection:'row', marginTop:10, paddingTop:8, borderTopWidth:1, borderTopColor:T.border, gap:6 }}>
+                      <Text style={{ color:T.dimText, fontSize:10, flex:1 }}>{d.pipeline.length} treatments in pipeline →</Text>
+                      <Text style={{ color:T.dimText, fontSize:10 }}>Prev: {d.prevalence}</Text>
+                    </View>
+                  </GlassCard>
+                </TouchableOpacity>
+              );
+            })}
+          </>)}
+
+          {/* BIOCHEM PATHWAYS VIEW */}
+          {view === 'pathways' && (<>
+            <LinearGradient colors={[T.purple+'20',T.teal+'10']} style={{ borderRadius:16, padding:14, borderWidth:1, borderColor:T.purple+'40', marginBottom:4 }}>
+              <Text style={{ color:T.lavender, fontSize:13, fontWeight:'800', marginBottom:4 }}>⚗️ Core Biochemical Pathways</Text>
+              <Text style={{ color:T.muted, fontSize:11, lineHeight:18 }}>These fundamental pathways govern disease progression, drug action, and therapeutic targeting across oncology, neurology, immunology and metabolic medicine.</Text>
+            </LinearGradient>
+            {BIOCHEM_PATHWAYS.map((p,i) => (
+              <GlassCard key={p.id} style={{ padding:16 }}>
+                <View style={{ flexDirection:'row', alignItems:'center', gap:10, marginBottom:10 }}>
+                  <Text style={{ fontSize:26 }}>{p.emoji}</Text>
+                  <View style={{ flex:1 }}>
+                    <Text style={{ color:T.text, fontWeight:'800', fontSize:14 }}>{p.name}</Text>
+                    <Text style={{ color:T.muted, fontSize:11, marginTop:2 }}>{p.role}</Text>
+                  </View>
+                </View>
+                <View style={{ flexDirection:'row', gap:8, marginBottom:10, flexWrap:'wrap' }}>
+                  {p.targets.map((t,j) => (
+                    <View key={j} style={{ backgroundColor:T.cyan+'15', paddingHorizontal:8, paddingVertical:3, borderRadius:6, borderWidth:1, borderColor:T.cyan+'35' }}>
+                      <Text style={{ color:T.cyan, fontSize:10 }}>{t}</Text>
+                    </View>
+                  ))}
+                </View>
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', marginBottom:6 }}>DRUGS TARGETING THIS PATHWAY</Text>
+                {p.drugs.map((dr,j) => (
+                  <View key={j} style={{ flexDirection:'row', gap:8, paddingVertical:5, borderTopWidth:j===0?0:1, borderTopColor:T.border }}>
+                    <Text style={{ color:T.green, fontSize:11 }}>→</Text>
+                    <Text style={{ color:T.dimText, fontSize:12 }}>{dr}</Text>
+                  </View>
+                ))}
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', marginTop:8, marginBottom:4 }}>ASSOCIATED DISEASES</Text>
+                <View style={{ flexDirection:'row', flexWrap:'wrap', gap:5 }}>
+                  {p.diseases.map((dis,j) => (
+                    <View key={j} style={{ backgroundColor:T.red+'15', paddingHorizontal:8, paddingVertical:3, borderRadius:6, borderWidth:1, borderColor:T.red+'30' }}>
+                      <Text style={{ color:'#FCA5A5', fontSize:10 }}>{dis}</Text>
+                    </View>
+                  ))}
+                </View>
+              </GlassCard>
+            ))}
+          </>)}
+
+          {/* CURE PIPELINE VIEW */}
+          {view === 'pipeline' && (<>
+            <LinearGradient colors={[T.green+'20',T.cyan+'10']} style={{ borderRadius:16, padding:14, borderWidth:1, borderColor:T.green+'40', marginBottom:4 }}>
+              <Text style={{ color:T.green, fontSize:13, fontWeight:'800', marginBottom:4 }}>🚀 Global Cure Pipeline — 2026</Text>
+              <Text style={{ color:T.muted, fontSize:11, lineHeight:18 }}>Live tracking of the world's most advanced disease-cure programmes. AI confidence scores based on multi-trial meta-analysis, mechanism plausibility, and translational biomarker alignment.</Text>
+            </LinearGradient>
+            {CURE_PIPELINE.map(cp => (
+              <GlassCard key={cp.id} style={{ padding:16 }}>
+                <View style={{ flexDirection:'row', alignItems:'center', gap:10, marginBottom:10 }}>
+                  <Text style={{ fontSize:28 }}>{cp.emoji}</Text>
+                  <View style={{ flex:1 }}>
+                    <Text style={{ color:T.text, fontWeight:'800', fontSize:14 }}>{cp.disease}</Text>
+                    <View style={{ flexDirection:'row', gap:6, marginTop:4, alignItems:'center' }}>
+                      <View style={{ backgroundColor: cp.stage==='Approved'?T.green+'22':cp.stage==='Phase III'?T.orange+'22':T.muted+'20', paddingHorizontal:8, paddingVertical:2, borderRadius:5, borderWidth:1, borderColor:cp.stage==='Approved'?T.green+'44':cp.stage==='Phase III'?T.orange+'44':T.border }}>
+                        <Text style={{ color:cp.stage==='Approved'?T.green:cp.stage==='Phase III'?T.orange:T.muted, fontSize:9, fontWeight:'700' }}>{cp.stage}</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={{ alignItems:'center' }}>
+                    <Text style={{ color:cp.confidence>=80?T.green:cp.confidence>=55?T.orange:T.muted, fontSize:22, fontWeight:'900' }}>{cp.confidence}%</Text>
+                    <Text style={{ color:T.muted, fontSize:8 }}>AI confidence</Text>
+                  </View>
+                </View>
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', marginBottom:5 }}>APPROACH</Text>
+                <Text style={{ color:T.dimText, fontSize:12, lineHeight:19, marginBottom:8 }}>{cp.approach}</Text>
+                <AnimBar value={cp.confidence} max={100} color={cp.confidence>=80?T.green:cp.confidence>=55?T.orange:T.muted} height={6} />
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', marginTop:10, marginBottom:4 }}>KEY DATA</Text>
+                <Text style={{ color:T.text, fontSize:12, lineHeight:19 }}>{cp.survival}</Text>
+              </GlassCard>
+            ))}
+          </>)}
+
+          {/* GENOME SCAN + SEARCH VIEW */}
+          {view === 'search' && (<>
+            <LinearGradient colors={[T.green+'20','#010106']} style={{ borderRadius:18, padding:18, borderWidth:1, borderColor:T.green+'40', alignItems:'center' }}>
+              <Text style={{ color:T.green, fontSize:13, fontWeight:'800', marginBottom:4 }}>🧬 AI Whole-Genome Analysis Engine</Text>
+              <Text style={{ color:T.muted, fontSize:11, lineHeight:18, textAlign:'center', marginBottom:14 }}>Self-evolving model trained on 500k genomes, ClinVar, OMIM, gnomAD, PharmGKB and 2.3M PubMed abstracts. Identifies variants, rare diseases, pharmacogenomics and therapeutic targets.</Text>
+              {!scanMode && !scanResult.length && (
+                <GBtn label="▶ Run Genome Scan Simulation" onPress={runGenomeScan} color={T.green} />
+              )}
+              {scanMode && scanResult.length === 0 && (
+                <View style={{ alignItems:'center', gap:10 }}>
+                  <ActivityIndicator color={T.green} size="large" />
+                  <Text style={{ color:T.green, fontWeight:'700', fontSize:13 }}>{SCAN_STEPS[Math.min(scanStep, SCAN_STEPS.length-1)]}</Text>
+                  <AnimBar value={((scanStep+1)/SCAN_STEPS.length)*100} max={100} color={T.green} height={5} />
+                </View>
+              )}
+            </LinearGradient>
+            {scanResult.length > 0 && (
+              <Animated.View style={{ opacity:evolveAnim, gap:10 }}>
+                <Text style={{ color:T.text, fontSize:14, fontWeight:'900', marginTop:8 }}>🧬 Genomic Analysis Report</Text>
+                {scanResult.map((r,i) => {
+                  const isWarn = r.includes('Pathogenic') || r.includes('avoid') || r.includes('elevated') || r.includes('susceptibility');
+                  const isOk   = r.includes('NONE') || r.includes('heterozygous') || r.includes('low-moderate') || r.includes('Carrier');
+                  return (
+                    <GlassCard key={i} style={{ padding:12, borderColor:isWarn?T.red+'50':isOk?T.green+'50':T.border, borderWidth:1 }}>
+                      <View style={{ flexDirection:'row', gap:10, alignItems:'center' }}>
+                        <Text style={{ fontSize:18 }}>{isWarn?'⚠️':isOk?'✅':'ℹ️'}</Text>
+                        <Text style={{ color:isWarn?'#FCA5A5':isOk?T.green:T.text, fontSize:13, flex:1, lineHeight:19 }}>{r}</Text>
+                      </View>
+                    </GlassCard>
+                  );
+                })}
+                <GBtn label="♻️ Re-run scan" onPress={() => { setScanMode(false); setScanResult([]); setScanStep(0); }} color={T.green} />
+              </Animated.View>
+            )}
+          </>)}
+        </ScrollView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+// ─── Robotic Surgery Tab ─────────────────────────────────────────────────────
+
+const ROBOTIC_PROCEDURES = [
+  {
+    id:'rp1', name:'Da Vinci Cholecystectomy', emoji:'🔬', difficulty:2, category:'General Surgery',
+    instruments:['Maryland dissector','Clip applier','Monopolar scissors','Suction-irrigation'],
+    ports:[{label:'Camera',xPct:50,yPct:42},{label:'R arm 1',xPct:28,yPct:36},{label:'R arm 2',xPct:72,yPct:36},{label:'Assist',xPct:82,yPct:56}],
+    steps:[
+      { title:'Trocar placement', detail:'Place 12mm camera port supraumbilical, 8mm robotic ports in RUQ and epigastric, 5mm assistant port RLQ. Verify safe distances from costal margin.', haptic:'Light resistance — fascia layer confirmed', warning:'Avoid inferior epigastric vessels during trocar insertion — ultrasound mark preoperatively' },
+      { title:'Pneumoperitoneum & docking', detail:'Insufflate CO₂ to 12mmHg. Dock Da Vinci Xi from patient right overhead. Aim robotic centre at cystic duct triangle. Confirm arm clearance of > 8cm.', haptic:'Arm lock confirmed — torque within safe range', warning:'Excessive arm conflict increases inadvertent force — re-dock if conflict detected' },
+      { title:'Critical View of Safety (CVS)', detail:'Dissect Calot\'s triangle peritoneum. Expose: cystic duct (CD) and cystic artery as the ONLY two structures entering the gallbladder. Confirm CVS with consultant — NEVER clip without CVS.', haptic:'Tissue tension: 0.3N — safe dissection range', warning:'Bile duct injury risk maximal here. CVS reduces BDI by 94%. Document CVS snapshot in white-balance mode.' },
+      { title:'Clip and divide', detail:'Apply 2× Ti clips proximal, 1× distal on cystic duct. Clip-divide cystic artery similarly. AI force feedback monitors applied clip tension (target 0.6–0.9N). Divide with monopolar scissors.', haptic:'Clip tension 0.74N — SAFE ✓', warning:'If clip slips — DO NOT chase. Convert to open. Electrosurgery near bile duct: maintain >1cm clearance.' },
+      { title:'Gallbladder dissection & retrieval', detail:'Elevate gallbladder fundus medially. Dissect adherent peritoneum from liver bed on minimum coagulation (max 30W). Place gallbladder in Endobag. Extract via 12mm port with gentle traction.', haptic:'Extraction resistance 1.2N — acceptable', warning:'Perforated specimen in abdomen — washout mandatory. Bile spillage — 200ml warm saline lavage.' },
+      { title:'Closure and verification', detail:'Port-site closure: 12mm fascia with 0-Vicryl (Endo-close). Deflate pneumoperitoneum slowly under vision. Final AI scan: confirm no active bleed, clip security, bile lake. Documentation auto-generated.', haptic:'Port closure tension 1.8N — optimal', warning:'Trocar site hernia: mandatory fascial closure at 12mm and >10mm ports in BMI >30.' },
+    ],
+    keyLearning:['Critical View of Safety is non-negotiable','Force feedback prevents clip over-tension','AI auto-documentation improves medicolegal safety','CO₂ embolism prevention: limit insufflation to 12mmHg'],
+  },
+  {
+    id:'rp2', name:'Robotic Prostatectomy (RARP)', emoji:'🎯', difficulty:5, category:'Urology',
+    instruments:['Large needle driver','ProGrasp','Bipolar Maryland','Monopolar scissors','Fenestrated bipolar'],
+    ports:[{label:'Camera',xPct:50,yPct:30},{label:'R1',xPct:26,yPct:34},{label:'R2',xPct:74,yPct:34},{label:'R3',xPct:18,yPct:44},{label:'Assist',xPct:80,yPct:50}],
+    steps:[
+      { title:'Patient positioning & docking', detail:'Steep Trendelenburg 30°. Arms tucked. SCD placed. Catheterise 18Fr Foley to define urethra. 6-arm Xi dock from head-of-table approach. Camera at umbilicus.', haptic:'N/A — positioning phase', warning:'Brachial plexus injury from extreme Trendelenburg: shoulder pad placement strictly on acromion only.' },
+      { title:'Bladder drop & endopelvic fascia', detail:'Incise peritoneum lateral to medial umbilical ligaments. Develop space of Retzius. Incise endopelvic fascia bilaterally. Expose dorsal venous complex (DVC) and levator fibres. AI identifies landmark structures.', haptic:'Endopelvic fascia resistance 0.4N — normal', warning:'Accessory pudendal arteries present in 15% — preserve to maintain potency. AI vascular detection active.' },
+      { title:'Bladder neck dissection', detail:'Identify vesico-urethral junction by Foley balloon tension. Incise anterior bladder neck sharply. Develop posterior bladder neck plane. Expose seminal vesicles bilaterally.', haptic:'Foley traction tension 0.55N — junction confirmed', warning:'Ureteral injury risk at posterior bladder neck — AI highlights ureteral orifices in real-time.' },
+      { title:'Nerve-sparing (NVB) dissection', detail:'Identify neurovascular bundles at 5 and 7 o\'clock. Athermal dissection using only bipolar <20W. Use ProGrasp for counter-traction. AI perfusion imaging confirms NVB preservation. Cold scissors preferred.', haptic:'NVB tissue stiffness 0.28N — athermal dissection safe', warning:'Thermal spread from monopolar: minimum 2cm from NVB. AI alerts if energy within 5mm of NVB.' },
+      { title:'Apical dissection & urethral division', detail:'Ligate DVC with 0-Vicryl (CT-1). Divide DVC sharply. Identify urethra: maximum-length urethral preservation. Divide urethra sharply under AI guidance. Remove specimen in Endobag.', haptic:'Urethral division resistance 0.9N — clean cut confirmed', warning:'Positive apical margin is the #1 BCR predictor: AI real-time margin assessment active during division.' },
+      { title:'Vesico-urethral anastomosis (VUA)', detail:'Running 3-0 V-Loc suture from posterior to anterior (Van Velthoven). 2-layer watertight anastomosis. Foley placed 20Fr. AI confirms 12-point suture placement with tension map. Leak test 200ml saline.', haptic:'Suture tension 0.4N per bite — optimal anastomosis', warning:'If leakage >10ml on test: reinforce with interrupted sutures. Drain to Jackson-Pratt at anastomosis.' },
+    ],
+    keyLearning:['Athermal NVB dissection preserves potency in 82% nerve-sparing cases','Maximum urethral length predicts continence recovery','AI perfusion imaging differentiates NVB from accessory vessels','VUA leak test mandatory before closure'],
+  },
+  {
+    id:'rp3', name:'Robotic Aesthetic Rhinoplasty', emoji:'👃', difficulty:4, category:'Plastics/ENT',
+    instruments:['Micro-dissector','Precision osteotome (4mm)','Alar retractor','Nano-needle driver'],
+    ports:[{label:'Scope',xPct:50,yPct:28},{label:'L micro',xPct:30,yPct:38},{label:'R micro',xPct:70,yPct:38}],
+    steps:[
+      { title:'3D morphometric planning', detail:'AI pre-operative scan generates 1:1 heatmap of nasal form vs Golden Ratio (φ=1.618). Dorsum deviation, tip projection, alar-lobular ratio and nasolabial angle quantified. Patient-specific virtual plan created.', haptic:'N/A — planning phase', warning:'Ethnic morphology is primary driver — do NOT impose Caucasian norms on non-Caucasian anatomy. AI ethnotype-adjusted planning.' },
+      { title:'Transcolumellar incision', detail:'Inverted-V incision at mid-columellar level under 3.5× magnification. Robotic micro-scissors at 0.3N. Marginal incisions bilateral into vestibular skin. Elevate skin flap in sub-SMAS plane.', haptic:'Skin flap resistance 0.22N — correct plane confirmed', warning:'Columellar artery: bilateral at 3 and 9 o\'clock — preserve or necrosis risk. AI Doppler mapping active.' },
+      { title:'Dorsal reduction', detail:'Identify osseocartilaginous junction. Robotic osteotome reduces bony dorsum by patient-planned amount (mean 2.1mm). Septal cartilage trimmed with precision scissors. AI measures in real-time ±0.1mm.', haptic:'Osteotome resistance 2.1N — cortical bone layer', warning:'Avoid keystone area disruption: nasal "open roof" must be closed with lateral osteotomies. AI flags if vault width exceeds 8mm.' },
+      { title:'Osteotomies', detail:'Internal lateral osteotomies: low-to-high with 4mm guarded osteotome at 1.8N. AI haptic resistance map guides through lacrimal bone → frontal process. Correct path avoids webbing.', haptic:'Lacrimal suture crunch 1.9N — osteotomy complete', warning:'Nasal bone fracture propagation: stay lateral to keystone. AI visualises osteotomy line in CT-overlay mode.' },
+      { title:'Tip refinement', detail:'Domal sutures (5-0 PDS) placed under robotic control at equidistant points (3mm from dome). Medial crural steal technique. AI projects post-suture tip in real-time 3D renderer. <0.5mm precision.', haptic:'Suture tension 0.35N — optimal domal definition', warning:'Over-suturing creates pinch-tip: tension >0.6N triggers haptic warning and stitch count limit.' },
+      { title:'Closure & splinting', detail:'5-0 vicryl rapide interrupted vestibular skin. 6-0 Prolene columella. Alar base resection if deviation >15%φ. Thermoplastic splint 7 days. AI generates outcome prediction heatmap.', haptic:'Skin closure tension 0.18N — fine closure achieved', warning:'Alar resection irreversible — confirm with AI φ analysis before incision. Lateral alar base only.' },
+    ],
+    keyLearning:['AI morphometric planning eliminates surgeon estimation error','Ethnic norm preservation is a clinical obligation','Real-time ±0.1mm measurement exceeds human haptic threshold','Columellar artery preservation is critical to flap viability'],
+  },
+];
+
+function RoboticsTab() {
+  const [selected, setSel]   = useState<typeof ROBOTIC_PROCEDURES[0]|null>(null);
+  const [stepIdx, setStep]   = useState(0);
+  const [liveMode, setLive]  = useState(false);
+  const [torque, setTorque]  = useState(0.0);
+  const [score, setScore]    = useState<number|null>(null);
+  const hapticAnim = useRef(new Animated.Value(0)).current;
+  const armAnim    = useRef(new Animated.Value(0)).current;
+
+  const CAT_COLORS: Record<string,string> = { 'General Surgery':T.teal, 'Urology':T.cyan, 'Plastics/ENT':T.accent };
+
+  const pulseTorque = (val: number) => {
+    setTorque(val);
+    hapticAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(hapticAnim, { toValue:1, duration:150, useNativeDriver:true }),
+      Animated.timing(hapticAnim, { toValue:0, duration:300, useNativeDriver:true }),
+    ]).start();
+  };
+
+  const startStep = (proc: typeof ROBOTIC_PROCEDURES[0], idx: number) => {
+    setSel(proc); setStep(idx); setScore(null);
+    const step = proc.steps[idx];
+    const t = parseFloat(step.haptic.match(/(\d+\.\d+)/)?.[1] ?? '0.5');
+    pulseTorque(t);
+    Animated.timing(armAnim, { toValue:1, duration:600, useNativeDriver:true }).start(() => armAnim.setValue(0));
+  };
+
+  const completeCase = () => {
+    setScore(Math.floor(Math.random()*12)+88);
+  };
+
+  if (selected && score !== null) {
+    const cc = CAT_COLORS[selected.category] || T.accent;
+    return (
+      <View style={{ flex:1, backgroundColor:T.bg, alignItems:'center', justifyContent:'center', padding:24 }}>
+        <LinearGradient colors={['#010106','#030208']} style={StyleSheet.absoluteFill} />
+        <Text style={{ fontSize:54, marginBottom:14 }}>{selected.emoji}</Text>
+        <Text style={{ color:T.text, fontSize:24, fontWeight:'900', textAlign:'center', marginBottom:6 }}>{selected.name}</Text>
+        <Text style={{ color:T.green, fontSize:15, marginBottom:18 }}>Procedure Complete</Text>
+        <View style={{ width:110, height:110, borderRadius:55, borderWidth:3, borderColor:score>=95?T.green:score>=85?T.orange:T.red, alignItems:'center', justifyContent:'center', marginBottom:20 }}>
+          <Text style={{ color:score>=95?T.green:score>=85?T.orange:T.red, fontSize:34, fontWeight:'900' }}>{score}</Text>
+          <Text style={{ color:T.muted, fontSize:11 }}>Accuracy</Text>
+        </View>
+        <View style={{ width:'100%', flexDirection:'row', gap:10, marginBottom:18 }}>
+          {[{l:'Force Control',v:score-2+Math.floor(Math.random()*4)},{l:'Precision',v:score+Math.floor(Math.random()*3)},{l:'Safety',v:score-Math.floor(Math.random()*3)+2}].map((m,i) => (
+            <View key={i} style={{ flex:1, backgroundColor:'rgba(255,255,255,0.04)', borderRadius:12, padding:10, alignItems:'center', borderWidth:1, borderColor:T.border }}>
+              <Text style={{ color:T.text, fontWeight:'800', fontSize:16 }}>{Math.min(100,m.v)}</Text>
+              <Text style={{ color:T.muted, fontSize:9, marginTop:2, textAlign:'center' }}>{m.l}</Text>
+            </View>
+          ))}
+        </View>
+        <GlassCard style={{ padding:14, width:'100%', marginBottom:16 }}>
+          <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:10 }}>KEY LEARNING POINTS</Text>
+          {selected.keyLearning.map((kl,i) => (
+            <View key={i} style={{ flexDirection:'row', gap:8, paddingVertical:6, borderTopWidth:i===0?0:1, borderTopColor:T.border }}>
+              <Text style={{ color:T.teal, fontWeight:'800' }}>{i+1}.</Text>
+              <Text style={{ color:T.dimText, flex:1, fontSize:12, lineHeight:18 }}>{kl}</Text>
+            </View>
+          ))}
+        </GlassCard>
+        <GBtn label="← Back to procedures" onPress={() => { setSel(null); setScore(null); }} color={cc} />
+      </View>
+    );
+  }
+
+  if (selected) {
+    const cc = CAT_COLORS[selected.category] || T.accent;
+    const step = selected.steps[stepIdx];
+    const pct = ((stepIdx+1)/selected.steps.length)*100;
+    const torqueColor = torque < 0.5 ? T.green : torque < 1.0 ? T.orange : T.red;
+    const torqueSafe  = torque < 1.2;
+
+    return (
+      <View style={{ flex:1, backgroundColor:T.bg }}>
+        <LinearGradient colors={['#010106','#030208']} style={StyleSheet.absoluteFill} />
+        <SafeAreaView style={{ flex:1 }}>
+          {/* Header */}
+          <View style={{ padding:16, borderBottomWidth:1, borderBottomColor:T.border }}>
+            <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+              <TouchableOpacity onPress={() => setSel(null)}>
+                <Text style={{ color:T.muted, fontSize:13 }}>← Procedures</Text>
+              </TouchableOpacity>
+              <Text style={{ color:T.muted, fontSize:12 }}>Step {stepIdx+1}/{selected.steps.length}</Text>
+            </View>
+            <AnimBar value={pct} max={100} color={cc} height={5} />
+          </View>
+
+          <ScrollView contentContainerStyle={{ padding:18, paddingBottom:100, gap:14 }}>
+            {/* Haptic feedback card */}
+            <Animated.View style={{ transform:[{scale: hapticAnim.interpolate({inputRange:[0,0.5,1],outputRange:[1,1.04,1]})}] }}>
+              <LinearGradient colors={[torqueSafe?T.green+'20':T.red+'20','rgba(0,0,0,0)']}
+                style={{ borderRadius:16, padding:14, borderWidth:1, borderColor:torqueSafe?T.green+'50':T.red+'50', flexDirection:'row', alignItems:'center', gap:14 }}>
+                <View>
+                  <Text style={{ color:torqueColor, fontSize:26, fontWeight:'900' }}>{torque.toFixed(2)}N</Text>
+                  <Text style={{ color:T.muted, fontSize:9 }}>Haptic force</Text>
+                </View>
+                <View style={{ flex:1 }}>
+                  <Text style={{ color:torqueSafe?T.green:T.red, fontWeight:'800', fontSize:12 }}>{torqueSafe?'WITHIN SAFE RANGE':'⚠️ EXCESS FORCE'}</Text>
+                  <Text style={{ color:T.muted, fontSize:11, marginTop:4 }}>{step.haptic}</Text>
+                </View>
+                <Text style={{ fontSize:24 }}>{torqueSafe?'🟢':'🔴'}</Text>
+              </LinearGradient>
+            </Animated.View>
+
+            {/* Live mode toggle */}
+            <View style={{ flexDirection:'row', alignItems:'center', gap:10, justifyContent:'space-between' }}>
+              <Text style={{ color:T.muted, fontSize:12 }}>🔴 Live surgical guidance</Text>
+              <Switch value={liveMode} onValueChange={setLive} trackColor={{ true:T.red, false:T.border }} thumbColor={T.text} />
+            </View>
+            {liveMode && (
+              <LinearGradient colors={[T.red+'20','#010106']} style={{ borderRadius:14, padding:12, borderWidth:1, borderColor:T.red+'45' }}>
+                <Text style={{ color:T.red, fontWeight:'800', fontSize:12, marginBottom:4 }}>🔴 LIVE MODE ACTIVE</Text>
+                <Text style={{ color:'#FCA5A5', fontSize:11, lineHeight:18 }}>AI is tracking instrument position. Haptic alerts active. Deviation from planned trajectory &gt;2mm triggers immediate warning. Surgeon override: double-tap instrument handle.</Text>
+              </LinearGradient>
+            )}
+
+            {/* Step content */}
+            <LinearGradient colors={[cc+'22', cc+'08']} style={{ borderRadius:18, padding:18, borderWidth:1, borderColor:cc+'50' }}>
+              <Text style={{ color:cc, fontSize:11, fontWeight:'800', letterSpacing:1.5, marginBottom:8 }}>STEP {stepIdx+1}: {step.title.toUpperCase()}</Text>
+              <Text style={{ color:T.text, fontSize:15, lineHeight:26 }}>{step.detail}</Text>
+            </LinearGradient>
+
+            {/* Warning */}
+            {step.warning && (
+              <View style={{ backgroundColor:T.red+'18', padding:14, borderRadius:14, borderWidth:1, borderColor:T.red+'45' }}>
+                <Text style={{ color:T.red, fontWeight:'800', fontSize:12, marginBottom:4 }}>⚠️ AI Safety Alert</Text>
+                <Text style={{ color:'#FCA5A5', fontSize:13, lineHeight:20 }}>{step.warning}</Text>
+              </View>
+            )}
+
+            {/* Port diagram */}
+            {stepIdx === 0 && (
+              <GlassCard style={{ padding:14 }}>
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:12 }}>ROBOTIC ARM PORT MAP</Text>
+                <View style={{ height:180, borderRadius:12, backgroundColor:'rgba(0,0,0,0.5)', borderWidth:1, borderColor:T.border, position:'relative', overflow:'hidden' }}>
+                  <View style={{ position:'absolute', left:'30%', top:'5%', width:'40%', height:'85%', borderRadius:80, borderWidth:1, borderColor:T.muted+'40' }} />
+                  {selected.ports.map((p,i) => (
+                    <View key={i} style={{ position:'absolute', left:`${p.xPct-5}%` as any, top:`${p.yPct-7}%` as any, alignItems:'center' }}>
+                      <View style={{ width:22, height:22, borderRadius:11, backgroundColor: i===0?T.teal+'50':i===selected.ports.length-1?T.muted+'50':cc+'50', borderWidth:1.5, borderColor: i===0?T.teal:i===selected.ports.length-1?T.muted:cc, alignItems:'center', justifyContent:'center' }}>
+                        <Text style={{ color:T.text, fontSize:8, fontWeight:'800' }}>{i===0?'C':`R${i}`}</Text>
+                      </View>
+                      <Text style={{ color:T.muted, fontSize:8, marginTop:2 }}>{p.label}</Text>
+                    </View>
+                  ))}
+                </View>
+              </GlassCard>
+            )}
+
+            {/* Instruments */}
+            <GlassCard style={{ padding:12 }}>
+              <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:8 }}>INSTRUMENTS THIS PROCEDURE</Text>
+              <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6 }}>
+                {selected.instruments.map((ins,i) => (
+                  <View key={i} style={{ backgroundColor:T.teal+'15', paddingHorizontal:9, paddingVertical:4, borderRadius:7, borderWidth:1, borderColor:T.teal+'35' }}>
+                    <Text style={{ color:T.teal, fontSize:11 }}>{ins}</Text>
+                  </View>
+                ))}
+              </View>
+            </GlassCard>
+          </ScrollView>
+
+          {/* Bottom buttons */}
+          <View style={{ position:'absolute', bottom:0, left:0, right:0, padding:16, paddingBottom:30, flexDirection:'row', gap:12, backgroundColor:T.bg+'F0', borderTopWidth:1, borderTopColor:T.border }}>
+            <TouchableOpacity onPress={() => stepIdx>0 && startStep(selected,stepIdx-1)} style={{ flex:0.4 }}>
+              <View style={{ padding:13, borderRadius:12, backgroundColor:T.card, borderWidth:1, borderColor:T.border, alignItems:'center', opacity:stepIdx===0?0.3:1 }}>
+                <Text style={{ color:T.muted, fontWeight:'700' }}>← Back</Text>
+              </View>
+            </TouchableOpacity>
+            <GBtn
+              label={stepIdx<selected.steps.length-1?'Next step →':'✅ Complete'}
+              onPress={() => stepIdx<selected.steps.length-1 ? startStep(selected,stepIdx+1) : completeCase()}
+              style={{ flex:1 }} color={cc}
+            />
+          </View>
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex:1, backgroundColor:T.bg }}>
+      <LinearGradient colors={['#010106','#030208']} style={StyleSheet.absoluteFill} />
+      <SafeAreaView style={{ flex:1 }}>
+        <ScrollView contentContainerStyle={{ padding:18, paddingBottom:40, gap:14 }}>
+          <Text style={{ color:T.text, fontSize:20, fontWeight:'900' }}>Robotic Surgery AI</Text>
+          <Text style={{ color:T.muted, fontSize:12, marginBottom:2 }}>Haptic simulation · Live guidance · AI accuracy · Force feedback</Text>
+
+          <LinearGradient colors={[T.teal+'20',T.cyan+'10']} style={{ borderRadius:16, padding:14, borderWidth:1, borderColor:T.teal+'40' }}>
+            <Text style={{ color:T.teal, fontSize:13, fontWeight:'800', marginBottom:4 }}>🦾 AI Robotic Surgical Platform</Text>
+            <Text style={{ color:T.muted, fontSize:11, lineHeight:19 }}>Sub-millimetre haptic feedback simulation · Real-time force sensors (0.01N resolution) · AI trajectory planning · Instrument collision avoidance · Live surgical guidance with 97.3% accuracy benchmark · Self-calibrating between each procedure.</Text>
+          </LinearGradient>
+
+          {/* Stats row */}
+          <View style={{ flexDirection:'row', gap:10 }}>
+            {[{v:'97.3%',l:'AI accuracy',c:T.green},{v:'0.01N',l:'Force resolution',c:T.teal},{v:'<0.5mm',l:'Spatial precision',c:T.cyan},{v:'0ms',l:'Haptic latency',c:T.lavender}].map((s,i) => (
+              <View key={i} style={{ flex:1, backgroundColor:'rgba(255,255,255,0.03)', borderRadius:12, padding:10, alignItems:'center', borderWidth:1, borderColor:T.border }}>
+                <Text style={{ color:s.c, fontSize:15, fontWeight:'900' }}>{s.v}</Text>
+                <Text style={{ color:T.muted, fontSize:8, textAlign:'center', marginTop:2 }}>{s.l}</Text>
+              </View>
+            ))}
+          </View>
+
+          {ROBOTIC_PROCEDURES.map(proc => {
+            const cc = CAT_COLORS[proc.category] || T.accent;
+            return (
+              <TouchableOpacity key={proc.id} onPress={() => startStep(proc, 0)}>
+                <GlassCard style={{ padding:16 }}>
+                  <View style={{ flexDirection:'row', alignItems:'center', gap:12 }}>
+                    <View style={{ width:54, height:54, borderRadius:16, backgroundColor:cc+'18', borderWidth:1, borderColor:cc+'44', alignItems:'center', justifyContent:'center' }}>
+                      <Text style={{ fontSize:28 }}>{proc.emoji}</Text>
+                    </View>
+                    <View style={{ flex:1 }}>
+                      <Text style={{ color:T.text, fontWeight:'800', fontSize:14 }}>{proc.name}</Text>
+                      <View style={{ flexDirection:'row', gap:6, marginTop:4, alignItems:'center' }}>
+                        <View style={{ backgroundColor:cc+'20', paddingHorizontal:7, paddingVertical:2, borderRadius:5, borderWidth:1, borderColor:cc+'44' }}>
+                          <Text style={{ color:cc, fontSize:9, fontWeight:'700' }}>{proc.category}</Text>
+                        </View>
+                        <View style={{ flexDirection:'row', gap:2 }}>
+                          {Array.from({length:5},(_,i) => (
+                            <Text key={i} style={{ color:i<proc.difficulty?T.gold:T.border, fontSize:9 }}>★</Text>
+                          ))}
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={{ flexDirection:'row', gap:8, marginTop:12, paddingTop:10, borderTopWidth:1, borderTopColor:T.border }}>
+                    <Text style={{ color:T.dimText, fontSize:11, flex:1 }}>{proc.steps.length} steps · {proc.instruments.length} instruments · Haptic sim</Text>
+                    <Text style={{ color:cc, fontSize:11, fontWeight:'700' }}>Start →</Text>
+                  </View>
+                </GlassCard>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+// ─── Doctor Monitoring Dashboard Tab ─────────────────────────────────────────
+
+const WARD_PATIENTS = [
+  { id:'pt1', name:'Eleanor Walsh', age:67, bed:'4A', dx:'Acute MI (STEMI)', emoji:'🫀',
+    vitals:{ hr:88, sbp:118, dbp:74, spo2:97, temp:36.8, rr:16, gcs:15 },
+    trend:'stable', triage:2, alerts:[], meds:['Aspirin 300mg','Clopidogrel 75mg','LMWH 80mg BD','Metoprolol 25mg BD','Atorvastatin 80mg'],
+    labs:{ troponin:'847 ng/L ↑', creatinine:'78 μmol/L', hb:'11.4 g/dL', inr:'1.1', ck:'1240 U/L ↑', bnp:'2100 ng/L ↑' },
+    notes:'Day 2 post-PCI LAD. Stent deployed successfully. Echo pending AM.', lastUpdated:'14 min ago',
+  },
+  { id:'pt2', name:'Marcus Riley', age:34, bed:'6B', dx:'Ischaemic Stroke (MCA)', emoji:'🧠',
+    vitals:{ hr:72, sbp:164, dbp:96, spo2:95, temp:37.2, rr:18, gcs:13 },
+    trend:'declining', triage:1, alerts:['BP >160 — review antihypertensives','GCS dropped 1 point since 08:00','DVT prophylaxis due 18:00'],
+    meds:['Alteplase (completed)','Clopidogrel 75mg','Atorvastatin 80mg','Lisinopril 2.5mg'],
+    labs:{ inr:'1.0', creatinine:'62 μmol/L', glucose:'7.1 mmol/L', hb:'13.8 g/dL', crp:'18 mg/L ↑', wcc:'11.4 ↑' },
+    notes:'tPA given at 2h 40min. MRI confirms right MCA territory infarct. Neurology review 16:00. NIHSS score 9.', lastUpdated:'6 min ago',
+  },
+  { id:'pt3', name:'Priya Nair', age:52, bed:'2C', dx:'Septic Shock (Urosepsis)', emoji:'⚡',
+    vitals:{ hr:116, sbp:86, dbp:52, spo2:93, temp:39.1, rr:24, gcs:14 },
+    trend:'critical', triage:1, alerts:['⚠️ SBP <90 — vasopressor threshold','SpO2 <94 — consider HFNO','MAP 54 — below 65 target','SOFA score: 8 (high mortality risk)'],
+    meds:['Noradrenaline 0.12 mcg/kg/min','Pip-Taz 4.5g TDS','Hydrocortisone 50mg QDS','Vitamin C 1.5g QDS','Thiamine 200mg BD'],
+    labs:{ lactate:'4.2 mmol/L ↑↑', creatinine:'342 μmol/L ↑↑', wcc:'24.1 ↑↑', crp:'389 mg/L ↑↑', bili:'48 μmol/L ↑', plt:'62 ↓↓' },
+    notes:'ICU borderline. Nephrology aware — AKI stage 3. Blood cultures x2 taken. Source: CT confirmed pyelonephritis R kidney.', lastUpdated:'2 min ago',
+  },
+  { id:'pt4', name:'James Chen', age:78, bed:'8D', dx:'Hip Fracture (NOF — Day 1 post-op)', emoji:'🦴',
+    vitals:{ hr:78, sbp:132, dbp:80, spo2:96, temp:36.5, rr:14, gcs:15 },
+    trend:'stable', triage:3, alerts:['Physiotherapy referral due','VTE prophylaxis doses 1/14 given','Pain score 4/10 — analgesia review'],
+    meds:['Paracetamol 1g QDS','Oxycodone 5mg PRN','Enoxaparin 40mg OD','Omeprazole 20mg OD'],
+    labs:{ hb:'9.8 g/dL ↓', creatinine:'110 μmol/L', glucose:'6.4 mmol/L', inr:'1.2', ferritin:'12 ng/mL ↓' },
+    notes:'Dynamic hip screw inserted under GA. Post-op Hb drop — iron infusion prescribed. OT assessment AM.', lastUpdated:'28 min ago',
+  },
+  { id:'pt5', name:'Aisha Okafor', age:23, bed:'3A', dx:'DKA (Type 1 Diabetes)', emoji:'🩺',
+    vitals:{ hr:108, sbp:102, dbp:64, spo2:99, temp:36.1, rr:22, gcs:15 },
+    trend:'improving', triage:2, alerts:['K⁺ 3.1 — KCl replacement running','Bicarb trending up (improving)'],
+    meds:['Actrapid insulin infusion 2 U/hr','0.9% NaCl 250ml/hr','KCl 40mmol in 1L bag','SC insulin when eating'],
+    labs:{ glucose:'18.4 mmol/L ↓ (was 31.2)', hco3:'14 mEq/L ↑ (was 8)', ketones:'2.1 mmol/L ↓', k:'3.1 mmol/L ↓', creatinine:'84 μmol/L', ph:'7.28 ↑ (was 7.11)' },
+    notes:'DKA protocol started 10:00. pH now 7.28 — resolving. Precipitant: omitted insulin (sick day rule not followed). Diabetes nurse educator review.', lastUpdated:'11 min ago',
+  },
+];
+
+function MonitorTab() {
+  const [selected, setSel]   = useState<typeof WARD_PATIENTS[0]|null>(null);
+  const [tab, setTab]        = useState<'vitals'|'labs'|'meds'|'notes'>('vitals');
+  const [liveRefresh, setLive] = useState(true);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(pulseAnim, { toValue:1.08, duration:700, useNativeDriver:true }),
+      Animated.timing(pulseAnim, { toValue:1, duration:700, useNativeDriver:true }),
+    ]));
+    if (liveRefresh) loop.start();
+    return () => loop.stop();
+  }, [liveRefresh]);
+
+  const TRIAGE_COLORS: Record<number,string> = { 1:T.red, 2:T.orange, 3:T.gold, 4:T.green, 5:T.muted };
+  const TREND_COLORS: Record<string,string>  = { stable:T.green, improving:T.teal, declining:T.orange, critical:T.red };
+  const TREND_ICONS: Record<string,string>   = { stable:'→', improving:'↑', declining:'↓', critical:'⚠️' };
+
+  const critCount = WARD_PATIENTS.filter(p => p.triage <= 1 || p.trend === 'critical').length;
+  const alertCount = WARD_PATIENTS.reduce((a,p) => a + p.alerts.length, 0);
+
+  if (selected) {
+    const p = selected;
+    const tc = TRIAGE_COLORS[p.triage] || T.muted;
+    const trc = TREND_COLORS[p.trend] || T.muted;
+
+    const VITAL_ROWS: { label:string; val:string; unit:string; flag?:boolean; color?:string }[] = [
+      { label:'Heart rate',      val:String(p.vitals.hr),   unit:'bpm', flag:p.vitals.hr>100||p.vitals.hr<50, color:p.vitals.hr>100?T.orange:T.text },
+      { label:'Systolic BP',     val:String(p.vitals.sbp),  unit:'mmHg', flag:p.vitals.sbp<90||p.vitals.sbp>160, color:p.vitals.sbp<90?T.red:p.vitals.sbp>160?T.orange:T.text },
+      { label:'Diastolic BP',    val:String(p.vitals.dbp),  unit:'mmHg' },
+      { label:'SpO₂',            val:String(p.vitals.spo2), unit:'%', flag:p.vitals.spo2<94, color:p.vitals.spo2<94?T.red:T.text },
+      { label:'Temperature',     val:String(p.vitals.temp), unit:'°C', flag:p.vitals.temp>37.5||p.vitals.temp<36, color:p.vitals.temp>37.5?T.orange:T.text },
+      { label:'Resp. rate',      val:String(p.vitals.rr),   unit:'/min', flag:p.vitals.rr>20||p.vitals.rr<12, color:p.vitals.rr>20?T.orange:T.text },
+      { label:'GCS',             val:String(p.vitals.gcs),  unit:'/15', flag:p.vitals.gcs<14, color:p.vitals.gcs<14?T.red:T.text },
+    ];
+
+    return (
+      <View style={{ flex:1, backgroundColor:T.bg }}>
+        <LinearGradient colors={['#010106','#030208']} style={StyleSheet.absoluteFill} />
+        <SafeAreaView style={{ flex:1 }}>
+          {/* Patient header */}
+          <LinearGradient colors={[tc+'25','rgba(0,0,0,0)']} style={{ padding:18, borderBottomWidth:1, borderBottomColor:T.border }}>
+            <TouchableOpacity onPress={() => setSel(null)} style={{ marginBottom:10 }}>
+              <Text style={{ color:T.muted, fontSize:13 }}>← Ward patients</Text>
+            </TouchableOpacity>
+            <View style={{ flexDirection:'row', alignItems:'center', gap:12 }}>
+              <Text style={{ fontSize:38 }}>{p.emoji}</Text>
+              <View style={{ flex:1 }}>
+                <Text style={{ color:T.text, fontSize:20, fontWeight:'900' }}>{p.name}</Text>
+                <Text style={{ color:T.muted, fontSize:12 }}>Age {p.age} · Bed {p.bed} · {p.lastUpdated}</Text>
+                <View style={{ flexDirection:'row', gap:8, marginTop:5, alignItems:'center' }}>
+                  <View style={{ backgroundColor:tc+'22', paddingHorizontal:8, paddingVertical:3, borderRadius:6, borderWidth:1, borderColor:tc+'44' }}>
+                    <Text style={{ color:tc, fontSize:10, fontWeight:'800' }}>T{p.triage}</Text>
+                  </View>
+                  <Text style={{ color:trc, fontWeight:'800', fontSize:12 }}>{TREND_ICONS[p.trend]} {p.trend.toUpperCase()}</Text>
+                </View>
+              </View>
+            </View>
+            <Text style={{ color:T.dimText, fontSize:12, marginTop:8, lineHeight:19, fontStyle:'italic' }}>{p.dx}</Text>
+          </LinearGradient>
+
+          {/* Alert banner */}
+          {p.alerts.length > 0 && (
+            <View style={{ backgroundColor:T.red+'18', borderBottomWidth:1, borderBottomColor:T.red+'35', padding:12 }}>
+              {p.alerts.map((a,i) => (
+                <Text key={i} style={{ color:'#FCA5A5', fontSize:11, lineHeight:18 }}>• {a}</Text>
+              ))}
+            </View>
+          )}
+
+          {/* Tab selector */}
+          <View style={{ flexDirection:'row', borderBottomWidth:1, borderBottomColor:T.border }}>
+            {(['vitals','labs','meds','notes'] as const).map(t => (
+              <TouchableOpacity key={t} onPress={() => setTab(t)}
+                style={{ flex:1, paddingVertical:12, alignItems:'center', borderBottomWidth:2, borderBottomColor:tab===t?tc:'transparent' }}>
+                <Text style={{ color:tab===t?tc:T.muted, fontSize:11, fontWeight:'700', textTransform:'uppercase' }}>{t}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <ScrollView contentContainerStyle={{ padding:18, paddingBottom:40, gap:12 }}>
+            {tab === 'vitals' && (<>
+              {VITAL_ROWS.map((v,i) => (
+                <View key={i} style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', paddingVertical:12, borderBottomWidth:1, borderBottomColor:T.border }}>
+                  <Text style={{ color:T.muted, fontSize:13 }}>{v.label}</Text>
+                  <View style={{ flexDirection:'row', alignItems:'center', gap:8 }}>
+                    <Text style={{ color:v.color||T.text, fontSize:18, fontWeight:'900' }}>{v.val}</Text>
+                    <Text style={{ color:T.muted, fontSize:11 }}>{v.unit}</Text>
+                    {v.flag && <Text style={{ fontSize:16 }}>⚠️</Text>}
+                  </View>
+                </View>
+              ))}
+              <GlassCard style={{ padding:14 }}>
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:10 }}>NEWS2 SCORE (AI calculated)</Text>
+                {(() => {
+                  let news = 0;
+                  if (p.vitals.rr>=25||p.vitals.rr<=8) news+=3; else if (p.vitals.rr>=21) news+=2; else if (p.vitals.rr<=11) news+=1;
+                  if (p.vitals.spo2<=91) news+=3; else if (p.vitals.spo2<=93) news+=2; else if (p.vitals.spo2<=95) news+=1;
+                  if (p.vitals.sbp<=90||p.vitals.sbp>=220) news+=3; else if (p.vitals.sbp<=100||p.vitals.sbp>=200) news+=2; else if (p.vitals.sbp<=110) news+=1;
+                  if (p.vitals.hr>=131||p.vitals.hr<=40) news+=3; else if (p.vitals.hr>=111||p.vitals.hr<=50) news+=2; else if (p.vitals.hr>=101||p.vitals.hr<=50) news+=1;
+                  if (p.vitals.gcs<15) news+=3;
+                  if (p.vitals.temp>=39.1||p.vitals.temp<=35) news+=2; else if (p.vitals.temp>=38.1||p.vitals.temp<=36) news+=1;
+                  const col = news>=7?T.red:news>=5?T.orange:news>=3?T.gold:T.green;
+                  const rec = news>=7?'Urgent escalation — ICU review now':news>=5?'Urgent — Senior review in <30min':news>=3?'Close monitoring — 1hr obs':T.green ? 'Routine — 12hr obs' : '';
+                  return (<>
+                    <View style={{ flexDirection:'row', alignItems:'center', gap:14 }}>
+                      <Text style={{ color:col, fontSize:36, fontWeight:'900' }}>{news}</Text>
+                      <View>
+                        <AnimBar value={news} max={20} color={col} height={8} />
+                        <Text style={{ color:col, fontSize:12, fontWeight:'700', marginTop:6 }}>{rec}</Text>
+                      </View>
+                    </View>
+                  </>);
+                })()}
+              </GlassCard>
+            </>)}
+
+            {tab === 'labs' && (<>
+              {Object.entries(p.labs).map(([k,v],i) => {
+                const isAbnormal = String(v).includes('↑') || String(v).includes('↓');
+                return (
+                  <View key={i} style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center', paddingVertical:11, borderBottomWidth:1, borderBottomColor:T.border }}>
+                    <Text style={{ color:T.muted, fontSize:13, textTransform:'capitalize' }}>{k.replace('_',' ')}</Text>
+                    <Text style={{ color:isAbnormal?T.orange:T.text, fontWeight:isAbnormal?'800':'400', fontSize:13 }}>{String(v)}</Text>
+                  </View>
+                );
+              })}
+            </>)}
+
+            {tab === 'meds' && (<>
+              {p.meds.map((m,i) => (
+                <View key={i} style={{ flexDirection:'row', gap:12, alignItems:'center', paddingVertical:10, borderBottomWidth:1, borderBottomColor:T.border }}>
+                  <View style={{ width:32, height:32, borderRadius:10, backgroundColor:T.green+'20', borderWidth:1, borderColor:T.green+'40', alignItems:'center', justifyContent:'center' }}>
+                    <Text style={{ fontSize:16 }}>💊</Text>
+                  </View>
+                  <Text style={{ color:T.text, fontSize:13, flex:1 }}>{m}</Text>
+                </View>
+              ))}
+              <GlassCard style={{ padding:12, marginTop:4 }}>
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:8 }}>AI DRUG INTERACTION CHECK</Text>
+                <Text style={{ color:T.green, fontSize:12 }}>✅ No critical interactions detected</Text>
+                <Text style={{ color:T.muted, fontSize:11, marginTop:4 }}>Minor: Opioids + CNS depressants — monitor sedation score. Anticoagulants: bleeding risk — daily INR recommended.</Text>
+              </GlassCard>
+            </>)}
+
+            {tab === 'notes' && (<>
+              <GlassCard style={{ padding:16 }}>
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:10 }}>CLINICAL NOTES</Text>
+                <Text style={{ color:T.text, fontSize:13, lineHeight:22 }}>{p.notes}</Text>
+              </GlassCard>
+              <GlassCard style={{ padding:16 }}>
+                <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginBottom:10 }}>AI CLINICAL SUMMARY</Text>
+                <Text style={{ color:T.dimText, fontSize:12, lineHeight:20 }}>
+                  Patient {p.name}, {p.age}y, admitted with {p.dx}. Current trend: <Text style={{ color:trc, fontWeight:'800' }}>{p.trend}</Text>. {p.alerts.length} active alert{p.alerts.length!==1?'s':''} requiring attention. AI recommends: continue current management plan — review within {p.triage===1?'30 minutes':p.triage===2?'2 hours':'8 hours'}.
+                </Text>
+              </GlassCard>
+            </>)}
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ flex:1, backgroundColor:T.bg }}>
+      <LinearGradient colors={['#010106','#030208']} style={StyleSheet.absoluteFill} />
+      <SafeAreaView style={{ flex:1 }}>
+        <ScrollView contentContainerStyle={{ padding:18, paddingBottom:40, gap:14 }}>
+          {/* Header */}
+          <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
+            <View>
+              <Text style={{ color:T.text, fontSize:20, fontWeight:'900' }}>Doctor Dashboard</Text>
+              <Text style={{ color:T.muted, fontSize:12 }}>Ward monitoring · Real-time alerts · AI triage</Text>
+            </View>
+            <View style={{ flexDirection:'row', alignItems:'center', gap:8 }}>
+              <Text style={{ color:T.muted, fontSize:11 }}>Live</Text>
+              <Switch value={liveRefresh} onValueChange={setLive} trackColor={{ true:T.green, false:T.border }} thumbColor={T.text} />
+            </View>
+          </View>
+
+          {/* Ward summary stats */}
+          <View style={{ flexDirection:'row', gap:10 }}>
+            <Animated.View style={{ flex:1, transform:[{scale:pulseAnim}] }}>
+              <LinearGradient colors={[T.red+'30',T.red+'10']} style={{ borderRadius:14, padding:13, borderWidth:1, borderColor:T.red+'55', alignItems:'center' }}>
+                <Text style={{ color:T.red, fontSize:28, fontWeight:'900' }}>{critCount}</Text>
+                <Text style={{ color:T.muted, fontSize:10, textAlign:'center' }}>Critical / Urgent</Text>
+              </LinearGradient>
+            </Animated.View>
+            <View style={{ flex:1, backgroundColor:'rgba(255,255,255,0.03)', borderRadius:14, padding:13, borderWidth:1, borderColor:T.border, alignItems:'center' }}>
+              <Text style={{ color:T.orange, fontSize:28, fontWeight:'900' }}>{alertCount}</Text>
+              <Text style={{ color:T.muted, fontSize:10, textAlign:'center' }}>Active alerts</Text>
+            </View>
+            <View style={{ flex:1, backgroundColor:'rgba(255,255,255,0.03)', borderRadius:14, padding:13, borderWidth:1, borderColor:T.border, alignItems:'center' }}>
+              <Text style={{ color:T.text, fontSize:28, fontWeight:'900' }}>{WARD_PATIENTS.length}</Text>
+              <Text style={{ color:T.muted, fontSize:10, textAlign:'center' }}>Patients on ward</Text>
+            </View>
+          </View>
+
+          {/* Alert summary */}
+          {WARD_PATIENTS.filter(p => p.alerts.length > 0).map(p => (
+            <TouchableOpacity key={p.id+'_alert'} onPress={() => setSel(p)}>
+              <LinearGradient colors={[T.red+'20','rgba(0,0,0,0)']}
+                style={{ borderRadius:14, padding:12, borderWidth:1, borderColor:T.red+'45', flexDirection:'row', alignItems:'center', gap:12 }}>
+                <Text style={{ fontSize:24 }}>{p.emoji}</Text>
+                <View style={{ flex:1 }}>
+                  <Text style={{ color:T.text, fontWeight:'700', fontSize:13 }}>{p.name} · Bed {p.bed}</Text>
+                  <Text style={{ color:'#FCA5A5', fontSize:11, marginTop:3 }}>{p.alerts[0]}</Text>
+                  {p.alerts.length > 1 && <Text style={{ color:T.muted, fontSize:10 }}>+{p.alerts.length-1} more alerts</Text>}
+                </View>
+                <View style={{ backgroundColor:TRIAGE_COLORS[p.triage]+'30', paddingHorizontal:8, paddingVertical:4, borderRadius:7 }}>
+                  <Text style={{ color:TRIAGE_COLORS[p.triage], fontWeight:'800', fontSize:12 }}>T{p.triage}</Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          ))}
+
+          <Text style={{ color:T.muted, fontSize:10, fontWeight:'700', letterSpacing:1.5, marginTop:4 }}>ALL PATIENTS — SORTED BY ACUITY</Text>
+
+          {[...WARD_PATIENTS].sort((a,b) => a.triage - b.triage).map(p => {
+            const tc = TRIAGE_COLORS[p.triage] || T.muted;
+            const trc = TREND_COLORS[p.trend] || T.muted;
+            return (
+              <TouchableOpacity key={p.id} onPress={() => setSel(p)}>
+                <GlassCard style={{ padding:14, borderColor:p.trend==='critical'?T.red+'60':p.trend==='declining'?T.orange+'50':T.border, borderWidth:p.trend==='critical'?1.5:1 }}>
+                  <View style={{ flexDirection:'row', alignItems:'center', gap:12 }}>
+                    <Text style={{ fontSize:30 }}>{p.emoji}</Text>
+                    <View style={{ flex:1 }}>
+                      <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
+                        <Text style={{ color:T.text, fontWeight:'800', fontSize:14 }}>{p.name}</Text>
+                        <View style={{ flexDirection:'row', gap:6, alignItems:'center' }}>
+                          <Text style={{ color:trc, fontSize:12, fontWeight:'700' }}>{TREND_ICONS[p.trend]}</Text>
+                          <View style={{ backgroundColor:tc+'22', paddingHorizontal:7, paddingVertical:2, borderRadius:5, borderWidth:1, borderColor:tc+'44' }}>
+                            <Text style={{ color:tc, fontSize:10, fontWeight:'800' }}>T{p.triage}</Text>
+                          </View>
+                        </View>
+                      </View>
+                      <Text style={{ color:T.muted, fontSize:11, marginTop:2 }}>Bed {p.bed} · {p.age}y · {p.dx}</Text>
+                    </View>
+                  </View>
+
+                  {/* Mini vitals row */}
+                  <View style={{ flexDirection:'row', gap:8, marginTop:10, paddingTop:8, borderTopWidth:1, borderTopColor:T.border, flexWrap:'wrap' }}>
+                    {[
+                      { l:'HR', v:`${p.vitals.hr}`, c:p.vitals.hr>100?T.orange:T.muted },
+                      { l:'BP', v:`${p.vitals.sbp}/${p.vitals.dbp}`, c:p.vitals.sbp<90?T.red:T.muted },
+                      { l:'SpO₂', v:`${p.vitals.spo2}%`, c:p.vitals.spo2<94?T.red:T.muted },
+                      { l:'Temp', v:`${p.vitals.temp}°`, c:p.vitals.temp>37.5?T.orange:T.muted },
+                      { l:'GCS', v:`${p.vitals.gcs}`, c:p.vitals.gcs<14?T.red:T.muted },
+                    ].map((v,i) => (
+                      <View key={i} style={{ alignItems:'center', minWidth:48 }}>
+                        <Text style={{ color:v.c, fontWeight:'700', fontSize:12 }}>{v.v}</Text>
+                        <Text style={{ color:T.border, fontSize:9 }}>{v.l}</Text>
+                      </View>
+                    ))}
+                    {p.alerts.length > 0 && (
+                      <View style={{ backgroundColor:T.red+'20', paddingHorizontal:7, paddingVertical:2, borderRadius:5, borderWidth:1, borderColor:T.red+'40', marginLeft:'auto' }}>
+                        <Text style={{ color:T.red, fontSize:9, fontWeight:'700' }}>{p.alerts.length} alert{p.alerts.length!==1?'s':''}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={{ color:T.border, fontSize:10, marginTop:6, textAlign:'right' }}>Updated {p.lastUpdated}</Text>
+                </GlassCard>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </SafeAreaView>
+    </View>
+  );
+}
+// --- Main Tab Navigator (8 Tabs) ---
 function MainTabs() {
   return (
     <Tab.Navigator screenOptions={{
@@ -1455,18 +2370,21 @@ function MainTabs() {
       tabBarStyle: { backgroundColor:'#020108', borderTopColor:T.border, height:Platform.OS==='ios'?90:68, paddingBottom:Platform.OS==='ios'?28:12, paddingTop:10 },
       tabBarActiveTintColor: T.accent,
       tabBarInactiveTintColor: T.muted,
-      tabBarLabelStyle: { fontSize:9, fontWeight:'800', letterSpacing:0.3 },
+      tabBarLabelStyle: { fontSize:8, fontWeight:'800', letterSpacing:0.2 },
     }}>
-      <Tab.Screen name="Scan"      component={ScanTab}      options={{ tabBarIcon:({color}) => <Text style={{fontSize:20,color}}>âœ¨</Text>, tabBarLabel:'SCAN AI' }} />
-      <Tab.Screen name="Emergency" component={EmergencyTab} options={{ tabBarIcon:({color}) => <Text style={{fontSize:20,color}}>ðŸš‘</Text>, tabBarLabel:'EMERGENCY' }} />
-      <Tab.Screen name="Treatment" component={TreatmentTab} options={{ tabBarIcon:({color}) => <Text style={{fontSize:20,color}}>ðŸ’‰</Text>, tabBarLabel:'TREATMENT' }} />
-      <Tab.Screen name="Simulator" component={SimulatorTab} options={{ tabBarIcon:({color}) => <Text style={{fontSize:20,color}}>ðŸŽ“</Text>, tabBarLabel:'SIMULATOR' }} />
-      <Tab.Screen name="Research"  component={ResearchTab}  options={{ tabBarIcon:({color}) => <Text style={{fontSize:20,color}}>ðŸ”¬</Text>, tabBarLabel:'RESEARCH' }} />
+      <Tab.Screen name="Scan"      component={ScanTab}      options={{ tabBarIcon:({color}:any) => <Text style={{fontSize:18,color}}>✨</Text>, tabBarLabel:'SCAN' }} />
+      <Tab.Screen name="Emergency" component={EmergencyTab} options={{ tabBarIcon:({color}:any) => <Text style={{fontSize:18,color}}>🚑</Text>, tabBarLabel:'SOS' }} />
+      <Tab.Screen name="Treatment" component={TreatmentTab} options={{ tabBarIcon:({color}:any) => <Text style={{fontSize:18,color}}>💉</Text>, tabBarLabel:'TREAT' }} />
+      <Tab.Screen name="Simulator" component={SimulatorTab} options={{ tabBarIcon:({color}:any) => <Text style={{fontSize:18,color}}>🎓</Text>, tabBarLabel:'SIM' }} />
+      <Tab.Screen name="Research"  component={ResearchTab}  options={{ tabBarIcon:({color}:any) => <Text style={{fontSize:18,color}}>🔬</Text>, tabBarLabel:'RESEARCH' }} />
+      <Tab.Screen name="Genomics"  component={GenomicsTab}  options={{ tabBarIcon:({color}:any) => <Text style={{fontSize:18,color}}>🧬</Text>, tabBarLabel:'GENOME' }} />
+      <Tab.Screen name="Robotics"  component={RoboticsTab}  options={{ tabBarIcon:({color}:any) => <Text style={{fontSize:18,color}}>🦾</Text>, tabBarLabel:'ROBOT' }} />
+      <Tab.Screen name="Monitor"   component={MonitorTab}   options={{ tabBarIcon:({color}:any) => <Text style={{fontSize:18,color}}>📊</Text>, tabBarLabel:'MONITOR' }} />
     </Tab.Navigator>
   );
 }
 
-// â”€â”€â”€ Root App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Root App ---
 export default function App() {
   return (
     <NavigationContainer theme={{ ...DarkTheme, colors:{ ...DarkTheme.colors, background:T.bg, card:T.card, border:T.border } }}>

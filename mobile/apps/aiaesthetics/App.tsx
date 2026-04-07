@@ -888,6 +888,42 @@ function EmergencyTab() {
   const [showProtocol, setShowPro] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  // CPR Timer state
+  const [cprActive, setCprActive]   = useState(false);
+  const [cprComps, setCprComps]     = useState(0);
+  const [cprSecs,  setCprSecs]      = useState(0);
+  const [cprPhase, setCprPhase]     = useState<'compress'|'ventilate'>('compress');
+  const [cprCycles,setCprCycles]    = useState(0);
+  const cprTimerRef = useRef<any>(null);
+  const cprStateRef = useRef({ comps:0, secs:0, phase:'compress' as 'compress'|'ventilate', cycles:0, active:false });
+
+  const startCPR = () => {
+    cprStateRef.current = { comps:0, secs:0, phase:'compress', cycles:0, active:true };
+    setCprActive(true); setCprComps(0); setCprSecs(0); setCprPhase('compress'); setCprCycles(0);
+    cprTimerRef.current = setInterval(() => {
+      const s = cprStateRef.current;
+      if (!s.active) return;
+      s.secs++;
+      if (s.phase === 'compress') {
+        s.comps++;
+        if (s.comps >= 30) { s.phase = 'ventilate'; }
+      } else {
+        if (s.secs % 2 === 0) { s.cycles++; s.phase = 'compress'; s.comps = 0; }
+      }
+      setCprSecs(s.secs); setCprComps(s.comps); setCprPhase(s.phase as any); setCprCycles(s.cycles);
+    }, 545);
+  };
+  const stopCPR = () => {
+    cprStateRef.current.active = false;
+    if (cprTimerRef.current) clearInterval(cprTimerRef.current);
+    setCprActive(false);
+  };
+  const resetCPR = () => {
+    stopCPR();
+    setCprComps(0); setCprSecs(0); setCprPhase('compress'); setCprCycles(0);
+    cprStateRef.current = { comps:0, secs:0, phase:'compress', cycles:0, active:false };
+  };
+
   const select = (c: EmergencyCondition) => {
     setSelected(c); setChecklist({}); setShowPro(false);
     fadeAnim.setValue(0);
@@ -920,6 +956,66 @@ function EmergencyTab() {
               <Text style={{ color:'#FCA5A5', fontSize:12, marginTop:2 }}>Call 000 (AU) / 911 (US) / 999 (UK) IMMEDIATELY. This tool does NOT replace emergency services.</Text>
             </View>
           </LinearGradient>
+
+          {/* ── CPR TIMER ─────────────────────────────────────────────── */}
+          <GlassCard style={{ padding:16 }}>
+            <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
+              <View>
+                <Text style={{ color:T.red, fontSize:14, fontWeight:'900' }}>💓 CPR TIMER</Text>
+                <Text style={{ color:T.muted, fontSize:10, marginTop:2 }}>AHA Guidelines · 30:2 ratio · 110 compressions/min</Text>
+              </View>
+              <View style={{ backgroundColor:cprActive?T.red+'22':T.card, borderRadius:10, paddingHorizontal:10, paddingVertical:5, borderWidth:1, borderColor:cprActive?T.red:T.border }}>
+                <Text style={{ color:cprActive?T.red:T.muted, fontSize:10, fontWeight:'800' }}>{cprActive?'● RUNNING':'■ READY'}</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection:'row', gap:8, marginBottom:12 }}>
+              <View style={{ flex:1, backgroundColor:T.bg, borderRadius:12, padding:12, alignItems:'center' }}>
+                <Text style={{ color:T.red, fontSize:28, fontWeight:'900', fontFamily:'monospace' }}>
+                  {String(Math.floor(cprSecs/60)).padStart(2,'0')}:{String(cprSecs%60).padStart(2,'0')}
+                </Text>
+                <Text style={{ color:T.muted, fontSize:9, marginTop:3 }}>ELAPSED</Text>
+              </View>
+              <View style={{ flex:1, backgroundColor:T.bg, borderRadius:12, padding:12, alignItems:'center' }}>
+                <Text style={{ color:cprPhase==='compress'?T.red:T.cyan, fontSize:28, fontWeight:'900' }}>{cprComps}</Text>
+                <Text style={{ color:T.muted, fontSize:9, marginTop:3 }}>COMPRESSIONS</Text>
+              </View>
+              <View style={{ flex:1, backgroundColor:T.bg, borderRadius:12, padding:12, alignItems:'center' }}>
+                <Text style={{ color:T.gold, fontSize:28, fontWeight:'900' }}>{cprCycles}</Text>
+                <Text style={{ color:T.muted, fontSize:9, marginTop:3 }}>CYCLES</Text>
+              </View>
+            </View>
+            <View style={{ backgroundColor:cprPhase==='compress'?T.red+'22':T.cyan+'22', borderRadius:12, padding:14, alignItems:'center', marginBottom:12, borderWidth:1.5, borderColor:cprPhase==='compress'?T.red+'66':T.cyan+'66' }}>
+              <Text style={{ color:cprPhase==='compress'?T.red:T.cyan, fontSize:18, fontWeight:'900' }}>
+                {cprPhase==='compress' ? `⬇️  PUSH HARD & FAST  ${cprComps}/30` : '💨 GIVE 2 BREATHS'}
+              </Text>
+              <Text style={{ color:T.muted, fontSize:10, marginTop:5 }}>
+                {cprPhase==='compress' ? '5cm depth · 110/min · allow full recoil' : 'tilt-head chin-lift · seal mask · 1 second each'}
+              </Text>
+            </View>
+            <View style={{ flexDirection:'row', gap:8 }}>
+              {!cprActive ? (
+                <TouchableOpacity onPress={startCPR} style={{ flex:1 }}>
+                  <LinearGradient colors={[T.red,'#B91C1C']} style={{ borderRadius:12, padding:14, alignItems:'center' }}>
+                    <Text style={{ color:'#fff', fontWeight:'900', fontSize:15 }}>▶  START CPR</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity onPress={stopCPR} style={{ flex:1 }}>
+                  <LinearGradient colors={['#374151','#111827']} style={{ borderRadius:12, padding:14, alignItems:'center' }}>
+                    <Text style={{ color:'#fff', fontWeight:'900', fontSize:15 }}>⏸  PAUSE</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity onPress={resetCPR} style={{ backgroundColor:T.card, borderRadius:12, padding:14, alignItems:'center', borderWidth:1.5, borderColor:T.border, minWidth:80 }}>
+                <Text style={{ color:T.muted, fontWeight:'800', fontSize:15 }}>↺  RESET</Text>
+              </TouchableOpacity>
+            </View>
+            {cprActive && cprSecs > 0 && cprSecs % 120 < 3 && cprSecs > 10 && (
+              <View style={{ backgroundColor:T.orange+'22', borderRadius:10, padding:10, marginTop:10, borderWidth:1, borderColor:T.orange+'55' }}>
+                <Text style={{ color:T.orange, fontSize:12, fontWeight:'900', textAlign:'center' }}>⚡ 2-MINUTE MARK — AED check · pulse check · rotate compressors</Text>
+              </View>
+            )}
+          </GlassCard>
 
           {/* Vital signs tracker */}
           <GlassCard style={{ padding:14 }}>

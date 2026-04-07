@@ -290,6 +290,7 @@ function HomeTab() {
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 18, gap: 8 }}>
             {filtered.map((app, i) => (
               <TouchableOpacity key={app.slug} activeOpacity={0.82}
+                onPress={() => Linking.openURL(`https://sianlk-unified-9w6jz.ondigitalocean.app/${app.slug}`)}
                 style={{ width: itemW, marginBottom: 6 }}>
                 <GCard style={{ padding: 14, alignItems: 'center' }}>
                   <LinearGradient colors={[app.color + '33', app.color + '11']}

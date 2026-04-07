@@ -55,9 +55,13 @@
       "privacyPolicy": "https://sianlk.com/privacy",
       "termsOfService": "https://sianlk.com/terms",
       "eas": {
-        "projectId": "sianlk-terminalai-v1"
+        "projectId": "549cc999-7dff-42a3-a61d-2483965f9ef7"
       }
     },
-    "owner": "sianlk"
+    "owner": "sianlk",
+    "updates": {
+      "url": "https://u.expo.dev/549cc999-7dff-42a3-a61d-2483965f9ef7",
+      "enabled": true
+    }
   }
 }

@@ -445,12 +445,22 @@ class EmbedRequest(BaseModel):
 async def aib_embed(req: EmbedRequest, user: User = Depends(get_current_user)):
     q = get_quantum()
     text = req.text[:500]
-    words = text.lower().split()
-    vocab = sorted(set(words))
-    vec = [words.count(w) / max(len(words), 1) for w in vocab[:128]]
-    if req.normalize and vec:
+    words = [w for w in text.lower().split() if w]
+
+    # Stable hash-based embedding to avoid degenerate equal-value vectors.
+    dims = 128
+    vec = [0.0] * dims
+    for idx, w in enumerate(words):
+        h = abs(hash(w))
+        bucket = h % dims
+        sign = 1.0 if ((h >> 1) & 1) == 0 else -1.0
+        weight = 1.0 + (idx % 7) * 0.07
+        vec[bucket] += sign * weight
+
+    if req.normalize and any(vec):
         norm = math.sqrt(sum(x ** 2 for x in vec))
         vec = [x / max(norm, 1e-10) for x in vec]
+
     q_score = q.quantum_score(vec[:10] if len(vec) >= 10 else vec + [0] * (10 - len(vec)))
     return {
         "embedding": vec,

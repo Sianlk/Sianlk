@@ -9,6 +9,7 @@ from typing import Optional, List, Dict, Any
 from backend.routers.auth import get_current_user
 from backend.models import User
 import math
+import random
 
 router = APIRouter(prefix="/api/apps", tags=["app-features"])
 

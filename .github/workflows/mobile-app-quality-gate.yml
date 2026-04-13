@@ -1,0 +1,47 @@
+name: Mobile App Quality Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'mobile/apps/**/package.json'
+      - 'mobile/apps/**/app.json'
+      - 'mobile/apps/**/eas.json'
+      - '.github/workflows/mobile-app-quality-gate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  quality-matrix:
+    name: Quality Check (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [sianlk, geniai, aiaesthetics, aib, aiblty, aibltycode, buildquote, comppropdata, terminalai, gitgit, geniqx]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mobile/apps/${{ matrix.app }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: mobile/apps/${{ matrix.app }}
+
+      - name: Lint
+        run: npm run lint
+        working-directory: mobile/apps/${{ matrix.app }}
+
+      - name: Typecheck
+        run: npm run typecheck
+        working-directory: mobile/apps/${{ matrix.app }}

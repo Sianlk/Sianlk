@@ -51,6 +51,7 @@ nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 28px;
 .apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
 .app-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:12px;transition:.2s}
 .app-card:hover{border-color:rgba(124,58,237,.5);box-shadow:0 4px 24px rgba(124,58,237,.08)}
+.app-card.clickable{cursor:pointer}
 .app-head{display:flex;align-items:flex-start;gap:14px}
 .app-emoji{font-size:2.2rem;line-height:1;flex-shrink:0}
 .app-meta{flex:1}
@@ -139,6 +140,19 @@ tr:hover td{background:rgba(30,30,46,.5)}
 .modal-msg.ok{display:block;background:rgba(16,185,129,.13);color:var(--green)}
 .modal-sw{text-align:center;margin-top:14px;font-size:.82rem;color:var(--muted)}
 .modal-sw a{color:var(--accent2);cursor:pointer}
+
+/* ── APP MODAL ───────────────────────── */
+#app-modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:210;align-items:center;justify-content:center}
+#app-modal-ov.open{display:flex}
+.app-modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:560px;animation:slideUp .2s ease}
+.app-modal-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px}
+.app-modal-icon{font-size:2rem;line-height:1}
+.app-modal-title{font-size:1.25rem;font-weight:800}
+.app-modal-cat{font-size:.72rem;color:var(--accent2);font-weight:700}
+.app-modal-desc{font-size:.9rem;line-height:1.6;color:var(--muted);margin:10px 0 14px}
+.app-modal-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.app-chip{font-size:.75rem;padding:4px 10px;border-radius:999px;background:var(--border);color:var(--text)}
+.app-demo-out{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px;min-height:74px;max-height:180px;overflow:auto;font-size:.8rem;line-height:1.45;white-space:pre-wrap}
 
 /* ── MISC ────────────────────────────── */
 footer{border-top:1px solid var(--border);text-align:center;padding:22px 24px;color:var(--muted);font-size:.78rem}
@@ -300,6 +314,31 @@ footer{border-top:1px solid var(--border);text-align:center;padding:22px 24px;co
   </div>
 </div>
 
+<!-- ── APP DETAILS MODAL ─────────────────────────────────── -->
+<div id="app-modal-ov" onclick="if(event.target===this)closeAppModal()">
+  <div class="app-modal">
+    <div class="app-modal-head">
+      <div class="app-modal-icon" id="appm-icon">✨</div>
+      <div style="flex:1">
+        <div class="app-modal-title" id="appm-title">App</div>
+        <div class="app-modal-cat" id="appm-cat">Category</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="closeAppModal()">Close</button>
+    </div>
+    <div class="app-modal-desc" id="appm-desc"></div>
+    <div class="app-modal-row">
+      <span class="app-chip" id="appm-price">Pro</span>
+      <span class="app-chip" id="appm-slug">slug</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn btn-primary btn-sm" onclick="runAppDemo()">Run Live Demo</button>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('register')">Get Started Free</button>
+      <a class="btn btn-ghost btn-sm" href="/docs" target="_blank">API Docs</a>
+    </div>
+    <div class="app-demo-out" id="appm-output">Click "Run Live Demo" to execute a real API call for this app.</div>
+  </div>
+</div>
+
 <footer>&copy; 2026 Sianlk Ltd &middot; <a href="/docs">API Docs</a> &middot; <a href="/redoc">ReDoc</a> &middot; <span class="green" style="font-size:.72rem">&#x25CF; All systems operational</span></footer>
 
 <script>
@@ -343,6 +382,7 @@ var APPS = [
 // ── State ─────────────────────────────────────────────────────────────
 var token = localStorage.getItem('sianlk_t');
 var user = null, isAdmin = false, adminStats = null, authMode = 'login';
+var activeApp = null;
 
 // ── Init ──────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
@@ -423,7 +463,7 @@ function renderApps(containerId) {
   var html = '';
   APPS.forEach(function(a) {
     html +=
-      '<div class="app-card">' +
+      '<div class="app-card clickable" role="button" tabindex="0" onclick="openApp(\'' + a.slug + '\')" onkeydown="if(event.key===\'Enter\' || event.key===\' \' ){openApp(\'' + a.slug + '\')}\">' +
         '<div class="app-head">' +
           '<div class="app-emoji">' + a.icon + '</div>' +
           '<div class="app-meta"><div class="app-name">' + a.name + '</div><span class="app-cat">' + a.cat + '</span></div>' +
@@ -434,16 +474,77 @@ function renderApps(containerId) {
           '<span class="price-pro">' + a.price_label + '</span>' +
         '</div>' +
         '<div class="app-stores">' +
-          '<button class="btn-store" onclick="storeTap(event)"><span>&#xF8FF;</span> App Store</button>' +
-          '<button class="btn-store" onclick="storeTap(event)"><span style=\'color:#3ddc84\'>&#x25B6;</span> Google Play</button>' +
+          '<button class="btn-store" onclick="event.stopPropagation();storeTap(event)"><span>&#xF8FF;</span> App Store</button>' +
+          '<button class="btn-store" onclick="event.stopPropagation();storeTap(event)"><span style=\'color:#3ddc84\'>&#x25B6;</span> Google Play</button>' +
         '</div>' +
         '<div class="app-actions">' +
-          '<button class="btn btn-primary btn-sm" onclick="openModal(\'register\')">Get Started Free</button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="openModal(\'login\')">Sign In</button>' +
+          '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openModal(\'register\')">Get Started Free</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openModal(\'login\')">Sign In</button>' +
         '</div>' +
       '</div>';
   });
   document.getElementById(containerId).innerHTML = html;
+}
+
+function getAppBySlug(slug) {
+  for (var i = 0; i < APPS.length; i++) if (APPS[i].slug === slug) return APPS[i];
+  return null;
+}
+
+function openApp(slug) {
+  var app = getAppBySlug(slug);
+  if (!app) return;
+  activeApp = app;
+  document.getElementById('appm-icon').innerHTML = app.icon;
+  document.getElementById('appm-title').textContent = app.name;
+  document.getElementById('appm-cat').textContent = app.cat;
+  document.getElementById('appm-desc').textContent = app.desc;
+  document.getElementById('appm-price').textContent = app.price_label;
+  document.getElementById('appm-slug').textContent = 'slug: ' + app.slug;
+  document.getElementById('appm-output').textContent = 'Click "Run Live Demo" to execute a real API call for this app.';
+  document.getElementById('app-modal-ov').classList.add('open');
+}
+
+function closeAppModal() {
+  document.getElementById('app-modal-ov').classList.remove('open');
+}
+
+function demoConfigFor(slug) {
+  if (slug === 'aiaesthetics') return {path:'/api/apps/aiaesthetics/analyze', body:{description:'dry skin with mild acne', concerns:['acne']}};
+  if (slug === 'aiblty') return {path:'/api/apps/aiblty/assess', body:{domain:'Python', level:'intermediate'}};
+  if (slug === 'aibltycode') return {path:'/api/apps/aibltycode/review', body:{code:'def add(a,b):\n    return a+b', language:'python'}};
+  if (slug === 'buildquote') return {path:'/api/apps/buildquote/estimate', body:{project_type:'house extension', sqft:430, location:'London'}};
+  if (slug === 'comppropdata') return {path:'/api/apps/comppropdata/valuate', body:{address:'1 Canary Wharf, London', sqft:2000, bedrooms:0, bathrooms:1, property_type:'commercial'}};
+  if (slug === 'geniai') return {path:'/api/apps/geniai/persona-chat', body:{message:'Say hello in one sentence', persona:'assistant'}};
+  if (slug === 'geniqx') return {path:'/api/apps/geniqx/circuit', body:{qubits:2, gates:[]}};
+  if (slug === 'gitgit') return {path:'/api/apps/gitgit/review', body:{diff:'diff --git a/a.py b/a.py\n+print("hello")'}};
+  if (slug === 'terminalai') return {path:'/api/apps/terminalai/explain', body:{command:'find / -name "*.log"'}};
+  if (slug === 'aib') return {path:'/api/apps/aib/embed', body:{text:'AI platform routing test', normalize:true}};
+  return {path:'/api/geniai/chat', body:{message:'Tell me about Sianlk in one sentence', app_slug:'sianlk'}};
+}
+
+function runAppDemo() {
+  if (!activeApp) return;
+  var out = document.getElementById('appm-output');
+  var cfg = demoConfigFor(activeApp.slug);
+  out.textContent = 'Running demo request to ' + cfg.path + ' ...';
+
+  if (!token && cfg.path.indexOf('/api/apps/') === 0) {
+    out.textContent = 'Sign in required for this app demo. Opening login modal...';
+    closeAppModal();
+    openModal('login');
+    return;
+  }
+
+  apiFetch('POST', cfg.path, cfg.body)
+    .then(function(d) {
+      var txt = JSON.stringify(d, null, 2);
+      if (txt.length > 1200) txt = txt.substring(0, 1200) + '\n...';
+      out.textContent = txt;
+    })
+    .catch(function(e) {
+      out.textContent = 'Demo error: ' + (e.message || 'Unknown error');
+    });
 }
 
 function storeTap(e) {
@@ -638,6 +739,13 @@ function addChatMsg(text, who) {
   var box = document.getElementById('chat-msgs');
   box.appendChild(el); box.scrollTop = box.scrollHeight; return el;
 }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeAppModal();
+  }
+});
 </script>
 </body>
 </html>

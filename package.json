@@ -37,7 +37,7 @@
     "react-native-svg": "15.8.0",
     "@expo/vector-icons": "^14.0.0",
     "react-hook-form": "^7.54.0",
-    "zod": "^3.23.0",
+    "zod": "^4.3.6",
     "date-fns": "^3.6.0",
     "i18next": "^23.0.0",
     "react-i18next": "^14.0.0",

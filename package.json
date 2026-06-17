@@ -40,7 +40,7 @@
     "zod": "^3.23.0",
     "date-fns": "^3.6.0",
     "i18next": "^23.0.0",
-    "react-i18next": "^14.0.0",
+    "react-i18next": "^17.0.2",
     "@sentry/react-native": "~6.3.0"
   },
   "devDependencies": {
